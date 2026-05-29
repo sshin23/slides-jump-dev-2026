@@ -1,0 +1,60 @@
+#+TITLE: Reed working notes — slides-jump-dev-2026
+#+OWNER: Reed (slides-jumpdev, opus-4.8)
+
+* Mission
+Prepare Sungho's two 2026 ExaModels talks:
+1. *JuMP-dev 2026 — current focus*. Software side: implementation, API, GPU acceleration, ecosystem fit (JuMP/NLPModels/MadNLP). Audience = JuMP/Julia-optimization developers.
+2. *SIAM Optimization — later*. Design principles: SIMD abstraction, AD strategy, why the design enables GPU performance. Audience = optimization researchers.
+
+* Decisions locked
+- *Tool*: LaTeX Beamer (Sungho 2026-05-29). Template = =/home/sushin/git/slides/slides-lids-2026/= (his existing LIDS deck). Preamble, MIT color palette, footer, =\refbr= / =\joint= macros, biblatex+biber setup all lifted verbatim.
+- *Source material*: =/home/sushin/git/papers/exa-models-paper/= (the ExaModels paper, target = MPC) and =github.com/exanauts/ExaModels.jl= (code + docs). Paper has CLAUDE.md that doubles as an outline.
+- *Joint-work attribution*: Pacaud (MINES Paris-PSL), Montoison (AMD — note: now at AMD, not Argonne), Schanen (Argonne), Anitescu (Argonne) — matching the paper's authorship.
+- *Bib*: =shin.bib= (copied from LIDS deck, 981KB master). Added =goddardMethodReachingExtreme1919= which was missing.
+- *Repo*: =git@github.com:sshin23/slides-jump-dev-2026.git=. Private. NOT pushed yet — committing locally only until Sungho gives the push call.
+
+* Open from Sungho
+- JuMP-dev 2026 *date + length* — Sungho asked Noor 2026-05-29 11:02. Pending.
+- *Audience emphasis weighting* — I proposed API → SIMD design → GPU benchmarks → ecosystem; Sungho hasn't pushed back, so default until told otherwise.
+
+* Current scaffold (commit pending)
+=main.tex= compiles cleanly with =latexmk -pdf main.tex=. 19 frames across 10 sections:
+- Title + Who-are-we?
+- Motivation (2): pattern structure, the AMS landscape gap
+- SIMD abstraction (3): pattern-data separation, Goddard rocket worked example, AMS comparison table
+- User-facing API (2): macros overview, Goddard rocket in ExaModels (CODE LISTING TODO)
+- Under the hood (2): parameterized expression tree, coloring-free sparse AD
+- GPU execution (1): KA.jl + 5 backends + implementation choices
+- Beyond JIT (2): AOT compilation + numeric precision, extensions
+- Numerical results (2): CPU vs JuMP/AMPL, GPU 5-backend scaling — *tables/plots TODO*
+- Conclusion (1): madsuite.org + ExaModels.jl + summary
+- References + backup title
+
+* TODOs (after Sungho approves outline)
+- [ ] Goddard rocket code listing (=examples/goddard.jl= in ExaModels.jl, or paper §2.4 listing)
+- [ ] Reuse CPU benchmark table from paper §9.2 (=benchmark/results/= → table.jl output)
+- [ ] Reuse GPU scaling plot from paper §9.3
+- [ ] Architecture/data-flow diagram for SIMDFunction + KA.jl path
+- [ ] Confirm Goddard rocket worked example is the right pedagogical anchor (vs ACOPF with 15 patterns)
+- [ ] Confirm subtitle: "Pattern-aware modeling and GPU-native automatic differentiation in Julia"
+- [ ] Date string on title page (waiting on Noor)
+
+* Conventions
+- All slide content lives in =main.tex= (single file, like LIDS deck). Will split into =sections/= only if it grows past readability.
+- Bibliography is =shin.bib= (single file). When a cite key is missing, append from =papers/exa-models-paper/main.bib=.
+- =figs/= holds team headshots from LIDS deck. Architecture / benchmark figures to be added.
+- =.gitignore= covers TeX byproducts (=*.aux= =*.log= =*.bbl= =*.bcf= =*.fdb_latexmk= etc).
+
+* Style anchors (from LIDS deck + Sungho's voice profile)
+- Dense bulleted itemize with =<n->= overlay reveals to time the narrative.
+- =\alert{}= sparingly --- the few words that carry the meaning.
+- Italic-centered *question* slides to pivot between sections.
+- =\begin{block}{Our approach}= / =\begin{block}{Observation}= for contribution callouts.
+- =\refbr{...\fullcite{...}}= at the bottom for primary references on a slide.
+- No em / en dashes (Sungho's rule). Two hyphens =--= as separator if needed.
+- Footer = name + email left, short title center, page n/N right.
+
+* Comms
+- Console channel: =#research-slides-jumpdev > general chat=.
+- Tag =@**Sungho**= for outline / section drafts that need his approval. Mechanical scaffolding (build setup, figs path, missing cite key) just do + batch summary.
+- React (=>>react:<id>:<emoji>=) to every inbox message before acting.

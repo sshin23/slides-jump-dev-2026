@@ -1,0 +1,420 @@
+\documentclass[aspectratio=169,11pt]{beamer}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{tikz}
+\usepackage{mathtools}
+\usepackage{multirow}
+\usepackage{booktabs}
+\usepackage[style=authoryear-comp,url=false,date=year,doi=false,isbn=false,eprint=true,maxnames=1,minnames=1,backend=biber,natbib=true]{biblatex}
+
+% ------------------------------------------------------------
+% MIT COLOR PALETTE  (from MIT Brand Guidelines)
+% ------------------------------------------------------------
+\definecolor{mitred}{HTML}{A31F34}       % Primary MIT red
+\definecolor{mitdarkgray}{HTML}{545454}  % Neutral dark gray
+\definecolor{mitlightgray}{HTML}{C7C7C7} % Light gray
+\definecolor{mitorange}{HTML}{D56F00}    % Secondary accent
+\definecolor{mitblue}{HTML}{8A8BFF}      % Accent cool tone
+
+% ------------------------------------------------------------
+% APPLY TO TITLES
+% ------------------------------------------------------------
+\setbeamercolor{title}{fg=mitred}
+\setbeamercolor{subtitle}{fg=mitdarkgray}
+\setbeamercolor{frametitle}{fg=mitred}
+\setbeamercolor{framesubtitle}{fg=mitdarkgray}
+\setbeamercolor{section title}{fg=mitred}
+\setbeamercolor{subsection title}{fg=mitdarkgray}
+
+\setbeamercolor{structure}{fg=mitred}
+\setbeamercolor{itemize item}{fg=mitred}
+\setbeamercolor{itemize subitem}{fg=mitdarkgray}
+\setbeamercolor{enumerate item}{fg=mitred}
+\setbeamercolor{enumerate subitem}{fg=mitdarkgray}
+
+\setbeamercolor{caption name}{fg=mitred}
+\setbeamercolor{caption}{fg=mitdarkgray}
+
+\setbeamertemplate{blocks}[rounded][shadow=false]
+\setbeamercolor{block title}{fg=mitred,bg=mitorange!20}
+\setbeamercolor{block body}{fg=mitdarkgray,bg=mitorange!20}
+\setbeamercolor{block title alerted}{fg=mitred,bg=mitred!20}
+\setbeamercolor{block body alerted}{fg=mitdarkgray,bg=mitred!20}
+\setbeamercolor{block title example}{fg=mitred,bg=mitdarkgray!20}
+\setbeamercolor{block body example}{fg=mitdarkgray,bg=mitdarkgray!20}
+
+\setbeamercolor{alerted text}{fg=mitred}
+\setbeamercolor{example text}{fg=mitblue}
+
+\setbeamercolor{palette primary}{fg=white,bg=mitred}
+\setbeamercolor{palette secondary}{fg=white,bg=mitdarkgray}
+\setbeamercolor{palette tertiary}{fg=white,bg=mitdarkgray}
+\setbeamercolor{palette quaternary}{fg=white,bg=mitdarkgray}
+
+\setbeamercolor{separation line}{bg=mitlightgray}
+\setbeamercolor{fine separation line}{bg=mitlightgray}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=mitred,
+  urlcolor=mitred,
+  citecolor=mitdarkgray
+}
+
+\setbeamersize{text margin left=0.5cm, text margin right=0.5cm}
+
+\setbeamertemplate{navigation symbols}{}
+
+\setbeamertemplate{footline}{%
+  \leavevmode%
+  \usebeamerfont{footline}
+  \usebeamercolor[fg]{footline}
+  \tiny
+  \tikz[remember picture, overlay,xscale=0.875,transform shape]{
+    \node[anchor=south] at (current page.south) {\insertshorttitle};
+    \node[anchor=south west] at (current page.south west) {Sungho Shin--- \href{mailto:sushin@mit.edu}{\tt sushin@mit.edu}};
+    \node[anchor=south east] at (current page.south east) {\insertframenumber/\inserttotalframenumber};
+  }
+}
+
+\setbeamercolor{footline}{fg=mitdarkgray}
+\setbeamerfont{footline}{size=\scriptsize}
+
+\addbibresource{shin.bib}
+\AtEveryCitekey{\clearfield{pages}}
+\AtEveryCitekey{\clearfield{volume}}
+\AtEveryCitekey{\clearfield{number}}
+\AtEveryCitekey{\clearfield{primaryclass}}
+\AtEveryCitekey{\clearfield{edition}}
+\AtEveryCitekey{\clearfield{publisher}}
+\AtEveryCitekey{\clearfield{series}}
+\AtEveryCitekey{\clearfield{address}}
+\DeclareNameAlias{default}{labelname}
+\renewbibmacro{in:}{}
+
+\newcommand{\refbr}[2][]{%
+  \begin{tikzpicture}[remember picture, overlay,xscale=0.875,transform shape,inner sep=2pt]
+    \node[anchor=south west,align=left,font=\tiny,color=mitdarkgray,text width=1.2\linewidth,yshift=10pt] at (current page.south west) {#1 #2};
+  \end{tikzpicture}%
+}
+
+\newcommand{\joint}[2][]{%
+  \begin{tikzpicture}[remember picture, overlay, xscale=0.875,transform shape,inner sep=2pt]
+    \node[anchor=south west,align=left,font=\tiny,color=mitdarkgray] at (current page.south west) {#1 #2};
+    \node[anchor=south east,align=left,font=\tiny,color=mitdarkgray] at (current page.south east) {\insertframenumber/\inserttotalframenumber};
+  \end{tikzpicture}%
+}
+
+\graphicspath{{figs/}}
+
+\title[ExaModels.jl on GPUs]{ExaModels.jl: an Algebraic Modeling System for Nonlinear Programming on GPUs}
+\subtitle{Pattern-aware modeling and GPU-native automatic differentiation in Julia}
+\author{
+  Sungho Shin\\
+  \url{shin.mit.edu}
+}
+\institute{
+  Massachusetts Institute of Technology
+}
+
+\date{JuMP-dev 2026}
+
+\begin{document}
+
+\frame{
+  \joint{
+    Joint work with:
+    Fran\c{c}ois Pacaud (MINES Paris-PSL),
+    Alexis Montoison (AMD),
+    Michel Schanen (Argonne),
+    Mihai Anitescu (Argonne)
+  }
+  \thispagestyle{empty}
+  \titlepage
+}
+
+\setbeamertemplate{footline}[content]
+\begin{frame}{Who are we?}
+  \begin{center}
+    \url{https://madsuite.org/}\\[.25in]
+    \includegraphics[width=.8in]{pacaud.jpeg}
+    \includegraphics[width=.8in]{montoison.jpeg}
+    \includegraphics[width=.8in]{shin.jpeg}
+    \includegraphics[width=.8in]{anitescu.jpeg}
+  \end{center}
+  \begin{itemize}
+  \item Fran\c{c}ois Pacaud @ MINES Paris-PSL (an ANL alumnus)
+  \item Alexis Montoison @ AMD (an ANL alumnus)
+  \item Sungho Shin @ MIT (an ANL alumnus)
+  \item Mihai Anitescu @ Argonne National Lab
+  \item and friends... Michel Schanen, ...
+  \end{itemize}
+\end{frame}
+
+% =============================================================
+\section{Motivation}
+% =============================================================
+\begin{frame}{Large-scale NLPs have repetitive structure}
+  \begin{itemize}
+  \item NLPs in engineering / science / statistics routinely involve millions of variables and constraints
+  \item<2-> Yet their formulations fit on a few pages---the same \alert{algebraic pattern} repeats across spatial nodes, time steps, scenarios, data samples
+  \item<3-> ACOPF on a network with thousands of buses: only \alert{15 distinct algebraic patterns} \citep{shinAcceleratingOptimalPower2024}
+  \item<4-> Problem size is driven by the number of \alert{data points}, not the number of patterns
+  \end{itemize}
+  \refbr{
+    \fullcite{shinAcceleratingOptimalPower2024}
+  }
+\end{frame}
+
+\begin{frame}{The AMS landscape flattens this structure}
+  \begin{itemize}
+  \item Algebraic modeling systems (AMS) sit between the formulation and the solver: AMPL, GAMS, JuMP, CasADi, Pyomo, ...
+  \item<2-> Most build a \alert{flat, per-scalar expression graph} at construction time; indexed constraints lower to a flat scalar collection \emph{before} AD
+  \item<3-> Pattern information that was visible to the user becomes invisible to the AD machinery
+  \item<4-> Consequences: redundant work per data point, no SIMD parallelism over patterns, \alert{no path to GPU} for the modeling layer
+  \end{itemize}
+  \visible<5->{
+    \begin{center}
+      \it What modeling abstraction preserves the pattern structure, and how can we harness it for efficient, GPU-compatible derivative evaluation?
+    \end{center}
+  }
+\end{frame}
+
+% =============================================================
+\section{SIMD abstraction}
+% =============================================================
+\begin{frame}{Pattern--data separation}
+  \begin{itemize}
+  \item Each objective term / constraint is a \alert{(pattern, data iterator)} pair
+  \item<2-> \alert{Pattern}: a single algebraic expression with free indices into variables, parameters, and a data point
+  \item<3-> \alert{Data iterator}: the collection of data points over which the pattern is evaluated
+  \item<4-> One compiled derivative kernel per pattern, executed across all data points in SIMD fashion
+  \end{itemize}
+  \medskip
+  \visible<5->{
+    \begin{block}{Design choice}
+      ExaModels \emph{requires} the user to expose pattern structure---in return, it compiles dedicated, GPU-native evaluation kernels.
+    \end{block}
+  }
+\end{frame}
+
+\begin{frame}{Worked example: Goddard rocket \citep{goddardMethodReachingExtreme1919}}
+  \small
+  \begin{align*}
+    \max\;& h_T \\
+    \text{s.t.}\;& h_t = h_{t-1} + \tfrac{\Delta t}{2}(v_t + v_{t-1}), && t=1,\dots,T \\
+    & v_t = v_{t-1} + \tfrac{\Delta t}{2}\!\left(\tfrac{\tau_t - D(h_t,v_t)}{m_t} - g(h_t) + \tfrac{\tau_{t-1} - D(h_{t-1},v_{t-1})}{m_{t-1}} - g(h_{t-1})\right), && t=1,\dots,T \\
+    & m_t = m_{t-1} - \tfrac{\Delta t}{2c}(\tau_t + \tau_{t-1}), && t=1,\dots,T \\
+    & h_0 = h^0,\; v_0 = 0,\; m_0 = m^0,\; m_T = m^f
+  \end{align*}
+  \begin{itemize}
+  \item<2-> Three dynamics constraints + boundary conditions = \alert{5 patterns}, regardless of $T$
+  \item<3-> As $T$ grows from $10^2$ to $10^6$, pattern count is \alert{fixed}; data-point count scales
+  \item<4-> Refining the discretization is a \alert{data} change, not a \alert{model} change
+  \end{itemize}
+  \refbr{
+    \fullcite{goddardMethodReachingExtreme1919}\\
+    \fullcite{dolanBenchmarkingOptimizationSoftware2001}
+  }
+\end{frame}
+
+\begin{frame}{Where ExaModels sits among AMSs with their own AD}
+  \begin{center}\small
+    \begin{tabular}{lllc}
+      \toprule
+      System & Language & AD strategy & Pattern-aware \\
+      \midrule
+      AMPL    & own            & ASL (built-in)            & no \\
+      GAMS    & own            & built-in                  & no \\
+      JuMP    & Julia          & reverse-mode on graph     & no \\
+      CasADi  & C++/Py/MATLAB  & source transform          & partial \\
+      GEKKO   & Python         & APMonitor backend         & no \\
+      Gravity & C++            & symbolic                  & yes \\
+      \midrule
+      \alert{ExaModels.jl} & Julia & \alert{type-stable per-pattern} & \alert{yes} \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \begin{itemize}
+  \item<2-> Two strategies preserve indexed structure: \alert{vectorization} (CasADi MX) and \alert{templatizing} (Gravity, ExaModels)
+  \item<3-> ExaModels = templatizing + Julia type-stable graph + KernelAbstractions.jl GPU portability
+  \item<4-> Neither CasADi nor Gravity supports GPU-native derivative evaluation
+  \end{itemize}
+\end{frame}
+
+% =============================================================
+\section{User-facing API}
+% =============================================================
+\begin{frame}{Building a model in ExaModels}
+  \begin{itemize}
+  \item Six macros cover the modeling surface:
+    \begin{itemize}
+    \item \texttt{@add\_var}, \texttt{@add\_par} --- variables, parameters
+    \item \texttt{@add\_obj} --- objective term over a data iterator
+    \item \texttt{@add\_con}, \texttt{@add\_con!} --- constraint over a data iterator
+    \item \texttt{@add\_expr} --- shared sub-expression over a data iterator
+    \end{itemize}
+  \item<2-> User registers custom univariate / bivariate functions with first \& second derivatives via \texttt{@register\_univariate}, \texttt{@register\_bivariate}
+  \item<3-> Output is a standard \texttt{NLPModels.AbstractNLPModel}---consumable by Ipopt, KNITRO, MadNLP, Uno, Percival, DCISolver, FletcherPenaltySolver
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Goddard rocket in ExaModels (sketch)}
+  % TODO: drop in real code listing from examples/goddard.jl in ExaModels.jl
+  \begin{itemize}
+  \item Code listing pending --- pull canonical version from \texttt{ExaModels.jl/examples} or paper \S 2.4
+  \item Key points to highlight when filled in:
+    \begin{itemize}
+    \item One \texttt{@add\_con} per dynamics constraint, indexed over \texttt{t = 1:T}
+    \item Pattern body is \alert{just algebra} --- no array allocation per index
+    \item Same code runs on CPU and any GPU backend by changing one keyword
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+% =============================================================
+\section{Under the hood}
+% =============================================================
+\begin{frame}{Parameterized expression tree}
+  \begin{itemize}
+  \item Each pattern compiles to a \alert{type-stable} expression tree
+  \item<2-> Node types: \texttt{Var}, \texttt{DataIndexed}, \texttt{ParameterNode}, \texttt{Constant\{T\}}, \texttt{Node1}, \texttt{Node2}
+  \item<3-> Nested type parameterization $\Rightarrow$ Julia compiler specializes a dedicated evaluator per pattern
+  \item<4-> The same tree is evaluated and differentiated with \alert{different data and arguments}, no recompilation
+  \item<5-> Algebraic simplification at compile time via multiple dispatch
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Coloring-free sparse AD}
+  \begin{itemize}
+  \item Standard sparse reverse-mode AD requires \alert{graph coloring} to reuse adjoint passes across nonzero columns
+  \item<2-> Coloring is GPU-unfriendly: irregular control flow, dynamic dispatch
+  \item<3-> ExaModels: \alert{a priori} sparsity analysis per pattern at model-construction time
+    \begin{itemize}
+    \item Relative index sequence of nonzeros within each pattern is compressed into a compact mapping
+    \item Sparse Jacobian and Lagrangian Hessian in COO directly, no coloring round
+    \end{itemize}
+  \item<4-> First-order: adjoint tree (\texttt{drpass}, \texttt{grpass}). Second-order: second-adjoint tree (\texttt{hrpass}, \texttt{hdrpass}, \texttt{hrpass0})
+  \end{itemize}
+\end{frame}
+
+% =============================================================
+\section{GPU execution}
+% =============================================================
+\begin{frame}{One model, five backends}
+  \begin{itemize}
+  \item \alert{SIMDFunction} is the compiled artifact for one pattern: a per-data-point kernel + sparsity map
+  \item<2-> CPU evaluation: \texttt{@simd} loop over data points
+  \item<3-> GPU evaluation: launched via \alert{KernelAbstractions.jl} \citep{churavyKernelAbstractionsjl2025}
+  \item<4-> Same model code targets:
+    \begin{itemize}
+    \item NVIDIA (CUDA) \quad $\bullet$\quad AMD (ROCm) \quad $\bullet$\quad Intel (oneAPI) \quad $\bullet$\quad Apple (Metal)
+    \end{itemize}
+  \item<5-> Implementation choices that matter on GPU:
+    \begin{itemize}
+    \item COO (not CSC) for sparse output --- coalesced writes
+    \item Objective: per-pattern buffer + reduction
+    \item Gradient: sparse accumulation + compress
+    \end{itemize}
+  \end{itemize}
+  \refbr{
+    \fullcite{churavyKernelAbstractionsjl2025}
+  }
+\end{frame}
+
+% =============================================================
+\section{Beyond JIT}
+% =============================================================
+\begin{frame}{Ahead-of-time compilation \& numeric precision}
+  \begin{itemize}
+  \item \alert{No runtime code generation in the hot path} --- the model evaluation surface is pure type-stable Julia
+  \item<2-> Compatible with \texttt{juliac --trim=safe} for AOT binaries; \texttt{NLPModelsIpoptLite.jl} demonstrates the end-to-end path
+  \item<3-> Same code paths serve JIT and AOT --- no separate codegen step (unlike CasADi)
+  \item<4-> Generic numeric precision: Float32, Float64, \texttt{DoubleFloats}, user-defined types --- \texttt{replace\_T} swaps the scalar type
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Extensions: parametric, two-stage stochastic, batch}
+  \begin{itemize}
+  \item \alert{Parametric problems}: \texttt{set\_value!} updates problem data without model reconstruction --- key for MPC / parameter sweeps
+  \item<2-> \alert{Two-stage stochastic}: \texttt{TwoStageExaCore} + \texttt{EachScenario()}; first-stage variables shared, second-stage replicated across scenarios
+  \item<3-> \alert{Batch models}: \texttt{BatchExaCore} stores independent NLP instances as columns of a matrix; \texttt{FlatNLPModel} exposes a single callback API to the solver
+  \item<4-> All three reuse the same SIMD abstraction + AD machinery
+  \end{itemize}
+\end{frame}
+
+% =============================================================
+\section{Numerical results}
+% =============================================================
+\begin{frame}{Benchmarks: CPU vs JuMP vs AMPL}{Luk\v{s}an--Vlc\v{e}k, COPS, PGLIB-OPF}
+  \begin{itemize}
+  \item Benchmark suites with ExaModels-native implementations:
+    \texttt{LuksanVlcekBenchmark.jl}, \texttt{COPSBenchmark.jl}, \texttt{ExaModelsPower.jl}
+  \item<2-> Function and derivative evaluation timing (AD layer only --- no solver)
+  \item<3-> \alert{Result placeholder} --- table from paper \S 9.2 to be inserted
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{GPU acceleration across five backends}
+  \begin{itemize}
+  \item Same model code, five execution targets: CUDA, ROCm, oneAPI, Metal, CPU-8T
+  \item<2-> Up to \alert{two orders of magnitude} acceleration over the CPU baseline on large instances
+  \item<3-> \alert{Plot placeholder} --- scaling plot from paper \S 9.3 to be inserted
+  \end{itemize}
+\end{frame}
+
+% =============================================================
+\section{Conclusion}
+% =============================================================
+\begin{frame}{Wrap-up}
+  \begin{columns}
+    \begin{column}{.5\textwidth}
+      \begin{center}
+        Project page:\\
+        \url{https://madsuite.org/}
+      \end{center}
+    \end{column}
+    \begin{column}{.5\textwidth}
+      \begin{center}
+        Package:\\
+        \url{https://github.com/exanauts/ExaModels.jl}
+      \end{center}
+    \end{column}
+  \end{columns}
+  \vspace{1em}
+  \begin{itemize}
+  \item \alert{Pattern--data separation} is the right modeling abstraction for large-scale, structured NLPs
+  \item<2-> A type-stable parameterized expression tree + coloring-free sparse AD makes GPU-native derivative evaluation practical
+  \item<3-> One model, five backends, no code change
+  \item<4-> ExaModels.jl is already the modeling layer for MadNLP's GPU-native interior-point methods \citep{pacaudCondensedspaceMethodsNonlinear2024}
+  \end{itemize}
+  \refbr{
+    \fullcite{pacaudCondensedspaceMethodsNonlinear2024}
+  }
+\end{frame}
+
+\AtNextBibliography{\tiny}
+\setbeamertemplate{bibliography item}{}
+\begin{frame}{References}
+  \tikz[text width=1.1\textwidth,xscale=.9,transform shape]{
+    \node at (current page.center) {\printbibliography[heading=none]};
+  }
+\end{frame}
+
+\begin{frame}{}
+  \joint{
+    Joint work with:
+    Fran\c{c}ois Pacaud (MINES Paris-PSL),
+    Alexis Montoison (AMD),
+    Michel Schanen (Argonne),
+    Mihai Anitescu (Argonne)
+  }
+  \thispagestyle{empty}
+  \titlepage
+\end{frame}
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: LaTeX
+%%% TeX-master: t
+%%% End:
