@@ -367,33 +367,6 @@
 \end{frame}
 
 % =============================================================
-\section{GPU execution}
-% =============================================================
-\begin{frame}{One model, six backends}
-  \begin{itemize}
-  \item \alert{SIMDFunction} is the compiled artifact for one pattern: a per-data-point kernel + sparsity map
-  \item<2-> CPU evaluation: \texttt{@simd} loop over data points
-  \item<3-> GPU evaluation: launched via \alert{KernelAbstractions.jl} \citep{churavyKernelAbstractionsjl2025}
-  \item<4-> Same model code targets:
-    \begin{itemize}
-    \item \texttt{CPU()} (multi-threaded) \quad $\bullet$\quad \texttt{CUDABackend()} (NVIDIA) \quad $\bullet$\quad \texttt{ROCBackend()} (AMD)
-    \item \texttt{OneAPIBackend()} (Intel) \quad $\bullet$\quad \texttt{MetalBackend()} (Apple) \quad $\bullet$\quad \texttt{OpenCLBackend()} (generic)
-    \end{itemize}
-  \item<5-> Implementation choices that matter on GPU:
-    \begin{itemize}
-    \item COO (not CSC) for sparse output --- coalesced writes
-    \item Objective: per-pattern buffer + reduction
-    \item Gradient: sparse accumulation + compress
-    \end{itemize}
-  \item<6-> Currently the GPU IPM consumer is \alert{MadNLP + MadNLPGPU} \citep{shinMadNLPjl2025,pacaudCondensedspaceMethodsNonlinear2024}
-  \end{itemize}
-  \refbr{
-    \fullcite{churavyKernelAbstractionsjl2025}\\
-    \fullcite{shinMadNLPjl2025}
-  }
-\end{frame}
-
-% =============================================================
 \section{Other nice things about ExaModels}
 % =============================================================
 \begin{frame}{Other nice things about ExaModels}
