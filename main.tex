@@ -390,8 +390,6 @@ optimize!(model)
   \begin{columns}[T]
     \begin{column}{.55\textwidth}
       \scriptsize
-      Per-term Rosenbrock pattern: $\displaystyle f_i(x) = 100\,(x_{i-1}^2 - x_i)^2 + (x_{i-1} - 1)^2$
-      \par\medskip
       \lstinputlisting{code/07_typestable_exa.jl}
       \lstinputlisting[language={}, basicstyle=\ttfamily\color{white}\tiny, backgroundcolor=\color{black}, frame=single, framerule=0pt, framesep=4pt, xleftmargin=4pt, xrightmargin=4pt, aboveskip=4pt, belowskip=0pt]{code/07_typestable_exa_repl.txt}
     \end{column}
@@ -400,9 +398,10 @@ optimize!(model)
       \includegraphics[height=.55\textheight]{exa_ad_passes.pdf}
     \end{column}
   \end{columns}
-  \visible<2->{\smallskip
-    \scriptsize Forward primals (green) and reverse adjoints (red) propagate through the \emph{same typed tree}. \alert{Per-pattern sparsity is known at compile time} $\Rightarrow$ Jacobian + Hessian in COO directly, \alert{no coloring round}, GPU-friendly.
-  }
+  \begin{itemize}\itemsep1pt
+  \item Forward primals (green) and reverse adjoints (red) propagate through the \emph{same typed tree}
+  \item<2-> \alert{Per-pattern sparsity is known at compile time} $\Rightarrow$ Jacobian + Hessian assembled in COO directly, \alert{no coloring round}, GPU-friendly
+  \end{itemize}
 \end{frame}
 
 % =============================================================
