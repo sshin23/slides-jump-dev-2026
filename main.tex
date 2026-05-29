@@ -197,6 +197,39 @@
 \end{frame}
 
 % =============================================================
+\section{What is ExaModels?}
+% =============================================================
+\begin{frame}[fragile]{What is ExaModels?}
+  \begin{columns}[T]
+    \begin{column}{.49\textwidth}
+      \begin{itemize}\itemsep3pt
+      \item \alert{Algebraic modeling system} embedded in Julia
+      \item Same philosophy as JuMP / AMPL / CasADi / Pyomo: a \alert{convenient indexed syntax} for the user
+      \item Uses \alert{scalar-based indexing} (vs vectorization \`a la CasADi MX) --- like JuMP
+      \item Builds an \texttt{NLPModels.AbstractNLPModel}: feeds Ipopt, KNITRO, MadNLP, Uno, \dots
+      \item<2-> \alert{\bfseries Killer feature}: GPU-native model + derivative evaluation; six KA.jl backends, maximal device performance
+      \end{itemize}
+    \end{column}
+    \begin{column}{.49\textwidth}
+      {\scriptsize\itshape Example: AC OPF active-power balance at each bus.\par}
+\begin{lstlisting}
+core = ExaCore(backend = CUDABackend())
+
+@add_con(core, cp,
+    b.pd + b.gs*vm[b.i]^2 for b in bus)
+@add_con!(core, cp,
+    a.bus =>  p[a.i]  for a in arc)
+@add_con!(core, cp,
+    g.bus => -pg[g.i] for g in gen)
+
+em = ExaModel(core)
+result = madnlp(em)
+\end{lstlisting}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% =============================================================
 \section{Why GPU-native modeling, only for NLPs?}
 % =============================================================
 \begin{frame}{Why a GPU-compatible modeling language?}{LP / QP / conic / DCP --- not strictly needed}
@@ -330,45 +363,6 @@ em = ExaModel(core); madnlp(em)
   }
 \end{frame}
 
-% =============================================================
-\section{SIMD abstraction}
-% =============================================================
-\begin{frame}[fragile]{An alternative to vectorization}{AC power balance at each bus}
-  \scriptsize
-  $\displaystyle p^d_i + g^{sh}_i\, V_i^2 + \sum_{a \in \mathcal{A}(i)} p_a \;-\; \sum_{g \in \mathcal{G}(i)} p^g_g \;=\; 0
-    \qquad \forall i \in \text{bus}$
-  \medskip
-  \begin{columns}[T]
-    \begin{column}{.49\textwidth}
-      \alert{\bfseries Vectorization} (e.g.\ JuMP / CasADi)
-\begin{lstlisting}
-# pre-built sparse incidence:
-#   E_arc[a, i] = 1 if arc a at bus i
-#   E_gen[g, i] = 1 if gen g at bus i
-@constraint(jm,
-    pd + gs .* vm.^2 + E_arc' * p
-    .== E_gen' * pg)
-\end{lstlisting}
-    \end{column}
-    \begin{column}{.49\textwidth}
-      \alert{\bfseries Templatizing} (ExaModels)
-\begin{lstlisting}
-@add_con(core, cp,
-    b.pd + b.gs*vm[b.i]^2 for b in bus)
-@add_con!(core, cp,
-    a.bus =>  p[a.i]  for a in arc)
-@add_con!(core, cp,
-    g.bus => -pg[g.i] for g in gen)
-\end{lstlisting}
-    \end{column}
-  \end{columns}
-  \medskip
-  \visible<2->{
-  \begin{block}{Not a "better-vs-worse" choice}
-    \small Vectorization shifts the work to pre-built sparse incidence matrices; templatizing exposes per-index sums directly. \alert{ExaModels follows the templatizing route: scalar-based indexing throughout.}
-  \end{block}
-  }
-\end{frame}
 
 \begin{frame}[fragile]{Goddard rocket in ExaModels}
 \begin{lstlisting}
