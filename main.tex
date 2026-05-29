@@ -206,7 +206,7 @@
       \item Canonical forms ($A, b, c$, cone description) $\Rightarrow$ \alert{one-shot CPU$\to$GPU copy} of problem data
       \item Solver \alert{can iterate entirely on the device}
       \item Solution copied \alert{once back} to CPU
-      \item Transfer cost \alert{amortized} over many iterations
+      \item These transfers \alert{can be costly}, but the cost is \alert{amortized} over many solver iterations
       \end{itemize}
     \end{column}
     \begin{column}{.36\textwidth}
