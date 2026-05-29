@@ -447,7 +447,7 @@ optimize!(model)
   \medskip
   \visible<5->{
     \begin{block}{Open question --- and continuing this thread}
-      \small We don't need to move all of JuMP onto the GPU. The win is \alert{GPU-native callbacks} eliminating the per-iteration round-trip. \texttt{GenOpt.jl} is a proof-of-concept; can JuMP itself expose pattern structure \alert{more concretely}?\\[2pt]
+      \scriptsize We don't need to move all of JuMP onto the GPU. The win is \alert{GPU-native callbacks} eliminating the per-iteration round-trip. \texttt{GenOpt.jl} is a proof-of-concept; \alert{deeper opportunity}: JuMP stores expressions in \alert{non-concrete} types, so the conversion loop pays per-iteration type inference. \alert{Concretely typed expression trees in JuMP would make the bridge cheap.}\\[2pt]
       Continuing at \alert{SIAM Optimization 2026}: ``The State of ExaModels'' (MS369), \alert{Fri June 5, 11:10 BST}, 50 George Square G.03.
     \end{block}
   }
