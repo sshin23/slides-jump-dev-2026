@@ -331,7 +331,13 @@
 \section{One remedy: hijack JuMP syntax (GenOpt.jl)}
 % =============================================================
 \begin{frame}[fragile]{One remedy: hijack the JuMP syntax (\texttt{GenOpt.jl} \citep{legatGenOptJl2025})}
-  \scriptsize Intercept JuMP's expression at construction time and route it to the ExaModels backend --- patterns survive intact, no scalar enumeration in the bridge.
+  \begin{tikzpicture}[remember picture, overlay]
+    \node[anchor=north east, xshift=-0.4cm, yshift=-1.1cm] at (current page.north east) {%
+      \begin{tabular}{c}\scriptsize
+        \includegraphics[width=0.55in]{blegat.png}\\
+        {\color{mitdarkgray}\texttt{@blegat}}
+      \end{tabular}};
+  \end{tikzpicture}%
 \begin{lstlisting}
 using GenOpt, JuMP, CUDA, MadNLP
 
@@ -345,9 +351,9 @@ set_optimizer(model, () -> GenOpt.ExaOptimizer(madnlp, CUDABackend()))
 optimize!(model)
 \end{lstlisting}
   \begin{itemize}
-  \item<2-> Patterns are preserved at \alert{JuMP-side construction}---ExaModels receives them \alert{intact} (no scalar enumeration in the bridge)
-  \item<3-> Minimal model rewrite: \texttt{container = ParametrizedArray} on \texttt{@constraint}, \texttt{lazy\_sum} on \texttt{@objective}
-  \item<4-> \emph{Legat's work, not mine} --- a really cool proof-of-concept route. I'm thinking about something else next.
+  \item Intercept JuMP's expression at construction time and route it to the ExaModels backend --- patterns survive intact, no scalar enumeration in the bridge.
+  \item<2-> Minimal model rewrite: \texttt{container = ParametrizedArray} on \texttt{@constraint}, \texttt{lazy\_sum} on \texttt{@objective}
+  \item<3-> \emph{Legat's work, not mine} --- a really cool proof-of-concept route. I'm thinking about something else next.
   \end{itemize}
   \refbr{
     \fullcite{legatGenOptJl2025}
