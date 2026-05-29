@@ -253,7 +253,7 @@
   \begin{columns}[T]
     \begin{column}{.58\textwidth}
       \begin{itemize}\itemsep2pt
-      \item Solver \alert{queries the modeling layer at every iteration} for
+      \item Solver \alert{queries the modeling layer at every iteration} via \alert{callbacks} ---
         $f(x),\; g(x),\; \nabla f(x),\; \nabla g(x),\; \nabla^2_{xx} L(x,\lambda)$
       \item Each query depends on the current iterate---\alert{no one-shot transfer}
       \item Without GPU-native callbacks, every iteration pays a CPU$\leftrightarrow$GPU round-trip: \alert{significant per-iteration overhead, no amortization}
