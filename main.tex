@@ -286,31 +286,44 @@
 % =============================================================
 \begin{frame}[fragile]{The ExaModels JuMP Interface}{Status Quo}
   \small
-  Load \texttt{ExaModels} + \texttt{JuMP} together---the \texttt{ExaModelsJuMP} / \texttt{ExaModelsMOI} package extensions activate automatically.\par
-  \medskip
-  \begin{onlyenv}<1->
-  \alert{\bfseries Path 1 --- Direct conversion to an \texttt{ExaModel}}\par
+  \begin{columns}[T]
+    \begin{column}{.42\textwidth}
+      \alert{\bfseries A JuMP model (Rosenbrock)}
 \begin{lstlisting}
-using ExaModels, JuMP, CUDA, MadNLPGPU
+using JuMP
 
-em = ExaModel(jm; backend = CUDABackend())   # JuMP -> GPU-ready ExaModel
-result = madnlp(em)                          # solve via NLPModels API
+N = 100
+jm = Model()
+@variable(jm, x[i=1:N],
+    start = isodd(i) ? -1.2 : 1.0)
+@objective(jm, Min,
+    sum(100*(x[i+1] - x[i]^2)^2
+        + (1 - x[i])^2 for i = 1:N-1))
 \end{lstlisting}
-  \end{onlyenv}
-  \medskip
-  \begin{onlyenv}<2->
-  \alert{\bfseries Path 2 --- ExaModels as a JuMP optimizer}\par
+    \end{column}
+    \begin{column}{.56\textwidth}
+      \alert{\bfseries Path 1 --- Direct conversion}\par
 \begin{lstlisting}
-using ExaModels, JuMP, CUDA, MadNLP, MadNLPGPU
+using ExaModels, CUDA, MadNLPGPU
 
-set_optimizer(jm, () -> ExaModels.Optimizer(MadNLP.madnlp, CUDABackend()))
-optimize!(jm)                                # stay in JuMP, solve on GPU
+em = ExaModel(jm; backend = CUDABackend())
+result = madnlp(em)
 \end{lstlisting}
-  \end{onlyenv}
-  \medskip
-  \begin{itemize}
-  \item<3-> Both routes share the same MOI bridge: bucket matching expression heads into templatized sums
-  \item<4-> Caveat: only \texttt{@constraint} / \texttt{@objective} are supported. \alert{\texttt{@NLconstraint} / \texttt{@NLobjective} are not}
+      \smallskip
+      \alert{\bfseries Path 2 --- ExaModels as a JuMP optimizer}\par
+\begin{lstlisting}
+using ExaModels, CUDA, MadNLP, MadNLPGPU
+
+set_optimizer(jm, () ->
+  ExaModels.Optimizer(MadNLP.madnlp, CUDABackend()))
+optimize!(jm)
+\end{lstlisting}
+    \end{column}
+  \end{columns}
+  \smallskip
+  \begin{itemize}\itemsep1pt
+  \item<2-> Both routes share the same MOI bridge: bucket matching expression heads
+  \item<3-> Caveat: only \texttt{@constraint} / \texttt{@objective} supported; \alert{\texttt{@NLconstraint} / \texttt{@NLobjective} are not}
   \end{itemize}
 \end{frame}
 
