@@ -394,6 +394,18 @@
 \end{frame}
 
 % =============================================================
+\section{Other nice things about ExaModels}
+% =============================================================
+\begin{frame}{Other nice things about ExaModels}
+  \begin{itemize}\itemsep4pt
+  \item \alert{\bfseries Portability}: same model code on \texttt{CPU()}, \texttt{CUDABackend()}, \texttt{ROCBackend()}, \texttt{OneAPIBackend()}, \texttt{MetalBackend()}, \texttt{OpenCLBackend()} --- one backend keyword switches hardware.
+  \item<2-> \alert{\bfseries Performance}: type-stable end-to-end $\Rightarrow$ Julia compiler inlines AD code per pattern; matches or beats AMPL / JuMP on CPU before any GPU is involved.
+  \item<3-> \alert{\bfseries AOT compatibility}: works under \texttt{juliac --trim=safe} for standalone binaries (no runtime codegen in the hot path) --- demonstrated by \texttt{NLPModelsIpoptLite.jl}.
+  \item<4-> \alert{\bfseries Two-stage + batch}: \texttt{TwoStageExaCore} for first-stage / recourse-stage structure across scenarios; \texttt{BatchExaCore} for many independent NLP instances sharing a structure --- natural fits for stochastic programming and parameter sweeps.
+  \end{itemize}
+\end{frame}
+
+% =============================================================
 \section{Where ExaModels--JuMP stands today}
 % =============================================================
 \begin{frame}{Status quo, May 2026}
