@@ -228,10 +228,10 @@
 \section{The translation layer}
 % =============================================================
 \begin{frame}[fragile]{Two paths from JuMP to ExaModels}
-  Load \texttt{ExaModels} + \texttt{JuMP} together---the \texttt{ExaModelsJuMP} / \texttt{ExaModelsMOI} package extensions activate automatically.
+  Load \texttt{ExaModels} + \texttt{JuMP} together---the \texttt{ExaModelsJuMP} / \texttt{ExaModelsMOI} package extensions activate automatically.\par
   \medskip
   \begin{onlyenv}<1->
-  \alert{\bfseries Path 1 --- Direct conversion to an \texttt{ExaModel}}
+  \alert{\bfseries Path 1 --- Direct conversion to an \texttt{ExaModel}}\par
 \begin{lstlisting}
 using ExaModels, JuMP, CUDA, MadNLPGPU
 
@@ -241,7 +241,7 @@ result = madnlp(em)                          # solve via NLPModels API
   \end{onlyenv}
   \medskip
   \begin{onlyenv}<2->
-  \alert{\bfseries Path 2 --- ExaModels as a JuMP optimizer}
+  \alert{\bfseries Path 2 --- ExaModels as a JuMP optimizer}\par
 \begin{lstlisting}
 using ExaModels, JuMP, CUDA, MadNLP, MadNLPGPU
 
@@ -394,28 +394,25 @@ optimize!(model)
 \section{Where ExaModels--JuMP stands today}
 % =============================================================
 \begin{frame}{Status quo, May 2026}
+  \small
   \alert{\bfseries Working today}
-  \begin{itemize}
-  \item Direct conversion \texttt{ExaModel(jm; backend = ...)} via the \texttt{ExaModelsJuMP} extension
-  \item \texttt{set\_optimizer(jm, () -> ExaModels.Optimizer(...))} for stay-in-JuMP workflows
-  \item GenOpt.jl \citep{legatGenOptJl2025} for pattern-preserving JuMP authoring
-  \item MadNLP + MadNLPGPU as the GPU IPM consumer \citep{shinMadNLPjl2025,pacaudCondensedspaceMethodsNonlinear2024}
+  \begin{itemize}\itemsep1pt
+  \item JuMP $\to$ ExaModels via \texttt{ExaModel(jm; backend = ...)} or \texttt{ExaModels.Optimizer}
+  \item Pattern-preserving JuMP authoring via GenOpt.jl \citep{legatGenOptJl2025}
+  \item MadNLP + MadNLPGPU is the GPU IPM consumer \citep{shinMadNLPjl2025,pacaudCondensedspaceMethodsNonlinear2024}
   \end{itemize}
-  \medskip
+  \smallskip
   \alert{\bfseries Recently simplified}
-  \begin{itemize}
-  \item<2-> ExaModels.jl \href{https://github.com/exanauts/ExaModels.jl/pull/282}{\#282} (merged 2026-05-28, M.~Schanen): drop \texttt{ExaModelsMadNLP} / \texttt{ExaModelsIpopt} extensions; \alert{go through NLPModels API directly}. Breaking change: the \texttt{MadNLPOptimizer} constructor was removed
+  \begin{itemize}\itemsep1pt
+  \item<2-> ExaModels.jl \href{https://github.com/exanauts/ExaModels.jl/pull/282}{\#282} (M.~Schanen, 2026-05-28): drop \texttt{ExaModelsMadNLP} / \texttt{ExaModelsIpopt} extensions $\Rightarrow$ \alert{NLPModels API directly}. Breaking: \texttt{MadNLPOptimizer} removed
   \end{itemize}
-  \medskip
+  \smallskip
   \alert{\bfseries Open}
-  \begin{itemize}
-  \item<3-> Legacy \texttt{@NLconstraint} / \texttt{@NLobjective} not supported by the bridge
-  \item<4-> Heterogeneous indexed structure (variable-size sums per index) does not round-trip through MOI bucketing---use GenOpt.jl or native ExaModels
-  \item<5-> GPU portability is real but constrained by upstream: GPUCompiler is currently pinned to \texttt{1.11} (OpenCL/oneAPI SPIR-V validation issue)
+  \begin{itemize}\itemsep1pt
+  \item<3-> \texttt{@NLconstraint} / \texttt{@NLobjective} not supported by the bridge
+  \item<4-> Heterogeneous indexed structure does not round-trip $\Rightarrow$ use GenOpt.jl or native
+  \item<5-> OpenCL / oneAPI backends held by a GPUCompiler pin (upstream SPIR-V issue)
   \end{itemize}
-  \refbr{
-    \fullcite{legatGenOptJl2025}
-  }
 \end{frame}
 
 % =============================================================
