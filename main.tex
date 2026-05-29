@@ -175,27 +175,6 @@
 \end{frame}
 
 % =============================================================
-\section{The question}
-% =============================================================
-\begin{frame}{You have a JuMP model. You want it on a GPU.}
-  \begin{itemize}
-  \item JuMP gives you a clean modeling layer, a mature solver ecosystem, and CPU performance that scales to large problems
-  \item<2-> GPUs sit one step further: \alert{factorization-based} optimization is starting to land on GPUs, with $\geq$10$\times$ speedups on the right problems \citep{pacaudCondensedspaceMethodsNonlinear2024}
-  \item<3-> But solver speedup is wasted if \alert{the model layer} can't feed it---callbacks must run on the device
-  \item<4-> Today's question:
-  \end{itemize}
-  \medskip
-  \visible<5->{
-    \begin{center}
-      \it Can ExaModels power JuMP on GPUs?
-    \end{center}
-  }
-  \refbr{
-    \fullcite{pacaudCondensedspaceMethodsNonlinear2024}
-  }
-\end{frame}
-
-% =============================================================
 \section{The translation layer}
 % =============================================================
 \begin{frame}[fragile]{Two paths from JuMP to ExaModels}
@@ -540,7 +519,7 @@ optimize!(model)
 % =============================================================
 \section{Conclusion}
 % =============================================================
-\begin{frame}{Can ExaModels power JuMP on GPUs?}
+\begin{frame}{Summary}
   \begin{columns}
     \begin{column}{.5\textwidth}
       \begin{center}
@@ -557,11 +536,17 @@ optimize!(model)
   \end{columns}
   \vspace{1em}
   \begin{itemize}
-  \item \alert{Yes}---via the translation layer for homogeneous batches, and via \texttt{GenOpt.jl} for the full pattern-preserving path
-  \item<2-> The lever is \alert{pattern--data separation}: a type-stable parameterized expression tree + coloring-free sparse AD makes GPU-native derivative evaluation practical
-  \item<3-> One model, five backends, no code change
+  \item ExaModels offers a \alert{SIMD abstraction} for NLPs---an alternative to vectorization that preserves indexed structure through (pattern, data iterator) pairs
+  \item<2-> Type-stable parameterized expression tree + coloring-free sparse AD make \alert{GPU-native} derivative evaluation practical
+  \item<3-> One model, six KA.jl backends, no code change
   \item<4-> Already the modeling layer for MadNLP's GPU-native interior-point methods \citep{pacaudCondensedspaceMethodsNonlinear2024}
   \end{itemize}
+  \medskip
+  \visible<5->{
+    \begin{block}{Discussion}
+      \emph{Can ExaModels power JuMP on GPUs?}---concrete examples to walk through after the talk.
+    \end{block}
+  }
   \refbr{
     \fullcite{pacaudCondensedspaceMethodsNonlinear2024}
   }
