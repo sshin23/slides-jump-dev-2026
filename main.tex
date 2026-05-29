@@ -246,14 +246,22 @@
       \centering
       \begin{tikzpicture}[
         every node/.style={font=\scriptsize, align=center},
-        host/.style={draw=mitdarkgray, rounded corners=2pt, fill=mitlightgray!40, minimum width=2.6cm, minimum height=0.9cm, inner sep=2pt},
-        dev/.style={draw=mitred, rounded corners=2pt, fill=mitred!15, minimum width=2.6cm, minimum height=0.9cm, inner sep=2pt},
+        host/.style={draw=mitdarkgray, rounded corners=2pt, fill=mitlightgray!40, minimum width=4.4cm, minimum height=0.6cm, inner sep=2pt},
+        dev/.style={draw=mitred, rounded corners=2pt, fill=mitred!15, minimum width=4.4cm, minimum height=0.6cm, inner sep=2pt},
       ]
-        \node[host] (cpu) at (0, 2.0) {\textbf{CPU}\\host memory};
-        \node[dev]  (gpu) at (0, 0)   {\textbf{GPU}\\device memory};
-        \draw[<->, very thick, mitred] (cpu.south) -- (gpu.north)
-          node[midway, right=2pt, font=\tiny, color=mitdarkgray, align=left]
-          {each iter:\\$f, g,$\\$\nabla f, \nabla g,$\\$\nabla^2 L$};
+        \node[host] (cpu) at (0, 2.5) {\textbf{CPU} host memory};
+        \node[dev]  (gpu) at (0, 0)   {\textbf{GPU} device memory};
+        \foreach \i in {0,1,2,3,4} {
+          \pgfmathsetmacro{\x}{-1.6 + 0.8*\i}
+          \draw[<->, thick, mitred] (\x, 2.15) -- (\x, 0.65);
+        }
+        \foreach \i in {0,1,2,3,4} {
+          \pgfmathsetmacro{\x}{-1.6 + 0.8*\i}
+          \node[font=\footnotesize\bfseries, color=mitred] at (\x, 0.42) {\i};
+        }
+        \node[font=\footnotesize\bfseries, color=mitred] at (2.05, 0.42) {$\cdots$};
+        \node[font=\scriptsize\itshape, color=mitdarkgray, anchor=east] at (-2.0, 0.42) {iter:};
+        \node[font=\tiny\itshape, color=mitdarkgray] at (0, -0.55) {transfer each iter: $f,\, g,\, \nabla f,\, \nabla g,\, \nabla^2 L$};
       \end{tikzpicture}
     \end{column}
   \end{columns}
