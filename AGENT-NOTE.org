@@ -38,13 +38,25 @@ Prepare Sungho's two 2026 ExaModels talks:
 - References + backup title
 
 * TODOs (after Sungho approves outline)
-- [ ] Goddard rocket code listing (=examples/goddard.jl= in ExaModels.jl, or paper §2.4 listing)
+- [X] Goddard rocket code listing --- compressed from paper §2.4, with GPU one-liner punchline (commit pending)
+- [X] Translation-layer JuMP code (=ExaModel(jm; backend = CUDABackend())=) --- from docs/src/jump.jl (commit pending)
+- [X] Six backends in §GPU execution (was five) (commit pending)
 - [ ] Reuse CPU benchmark table from paper §9.2 (=benchmark/results/= → table.jl output)
 - [ ] Reuse GPU scaling plot from paper §9.3
 - [ ] Architecture/data-flow diagram for SIMDFunction + KA.jl path
 - [ ] Confirm Goddard rocket worked example is the right pedagogical anchor (vs ACOPF with 15 patterns)
-- [ ] Confirm subtitle: "Pattern-aware modeling and GPU-native automatic differentiation in Julia"
-- [ ] Date string on title page (waiting on Noor)
+- [ ] Confirm subtitle: "Pattern-aware modeling and GPU-native automatic differentiation"
+- [ ] Date string on title page (waiting on Noor / Sungho confirm of May 31 vs June 1)
+- [ ] Thank-you slide: confirm =hfytr= = "Archim J" is the preferred display
+- [ ] Thank-you slide: confirm order (currently contribution-count desc)
+
+* Source citations (for traceability)
+- ExaModels docs: =/tmp/exanauts-em/docs/src/= --- guide.jl (canonical Luksan-Vlcek-1 walkthrough), gpu.jl (backend-swap pattern), jump.jl (one-liner JuMP bridge + Optimizer interface)
+- Paper Goddard code: =/home/sushin/git/papers/exa-models-paper/sections/modeling.tex= §2.4
+- Paper structure / CLAUDE.md: =/home/sushin/git/papers/exa-models-paper/CLAUDE.md=
+- Contributors: =gh api repos/exanauts/ExaModels.jl/contributors= (9 humans excl. speaker; bot filtered)
+- KA backends: =/tmp/exanauts-em/Project.toml= weakdeps (6 backends: CPU, CUDA, ROCm, oneAPI, Metal, OpenCL)
+- JuMP extension wiring: =/tmp/exanauts-em/Project.toml= [extensions] block (=ExaModelsJuMP=, =ExaModelsMOI=, ...)
 
 * Conventions
 - All slide content lives in =main.tex= (single file, like LIDS deck). Will split into =sections/= only if it grows past readability.
