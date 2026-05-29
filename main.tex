@@ -369,7 +369,7 @@ optimize!(model)
     \end{column}
   \end{columns}
   \visible<2->{\smallskip
-    \scriptsize\alert{ExaModels encodes the algebraic structure directly into the type system.} Just by looking at the type, you can read the structure of the expression --- and the Julia compiler dispatches statically all the way down.
+    \scriptsize\alert{ExaModels encodes the algebraic structure directly into the type system.} Just by looking at the type, you can read the structure of the expression. At compile time the structure is fully known, so \alert{model creation, AD, and evaluation are specialized for this algebraic expression}.
   }
 \end{frame}
 
