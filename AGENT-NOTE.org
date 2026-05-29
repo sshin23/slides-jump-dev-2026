@@ -64,6 +64,9 @@ Prepare Sungho's two 2026 ExaModels talks:
 - =figs/= holds team headshots from LIDS deck. Architecture / benchmark figures to be added.
 - =.gitignore= covers TeX byproducts (=*.aux= =*.log= =*.bbl= =*.bcf= =*.fdb_latexmk= etc).
 
+* Code-listing background rule (Sungho 2026-05-29 11:25)
+Every code listing gets a *light background tint* --- currently =mitlightgray!30= via =\lstset{backgroundcolor=...}= with =frame=single, framerule=0pt= for a borderless tinted box. *Why*: makes code blocks visually distinct from prose without busy borders; Sungho's general slide style. *How to apply*: change the listings style globally in the preamble's =\lstset=; don't put per-listing overrides.
+
 * Acknowledgement rule (Sungho 2026-05-29 11:21)
 When acknowledging a person on a slide (contributor, collaborator, co-author): include their *GitHub handle* AND *profile photo* alongside the name. Avatars live in =figs/<github_login>.{jpeg,png}=, downloaded via =gh api users/<login> --jq '.avatar_url'=. If a person has no GitHub presence, show name + affiliation alone; never invent a handle. *Why*: makes attribution concrete and recognizable to a JuMP-dev audience; people in the room know each other by GitHub handle as often as by full name.
 
