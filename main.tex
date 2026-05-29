@@ -373,18 +373,26 @@ optimize!(model)
   }
 \end{frame}
 
-% =============================================================
-\section{Under the hood}
-% =============================================================
-\begin{frame}{Type-stable expression tree + coloring-free sparse AD}
-  \begin{center}
-    \only<1>{\includegraphics[height=.65\textheight]{exa_expression_tree.pdf}}%
-    \only<2->{\includegraphics[height=.65\textheight]{exa_ad_passes.pdf}}%
-  \end{center}
-  \vfill
-  \scriptsize
-  \only<1>{\alert{Type-stable graph} parameterized over data and variables: compiles to a dedicated evaluator per pattern, no recompilation as $x,\theta$ change.}%
-  \only<2->{\alert{Sparse reverse-mode AD without graph coloring}: a priori per-pattern sparsity analysis $\Rightarrow$ Jacobian + Lagrangian Hessian in \alert{COO directly}, no coloring round, GPU-friendly.}%
+\begin{frame}[fragile]{ExaModels: AD passes through the same typed tree}
+  \begin{columns}[T]
+    \begin{column}{.55\textwidth}
+      \scriptsize
+      \alert{\bfseries Math.} Per-term Rosenbrock pattern:\\[2pt]
+      $\displaystyle f_i(x) = 100\,(x_{i-1}^2 - x_i)^2 + (x_{i-1} - 1)^2$
+      \par\medskip
+      \alert{\bfseries Code.}\par
+      \lstinputlisting{code/07_typestable_exa.jl}
+      \alert{\bfseries Julia REPL.}\par
+      \lstinputlisting[language={}, basicstyle=\ttfamily\tiny, backgroundcolor=\color{white}, frame=none, xleftmargin=0pt, xrightmargin=0pt, aboveskip=0pt, belowskip=0pt]{code/07_typestable_exa_repl.txt}
+    \end{column}
+    \begin{column}{.43\textwidth}
+      \centering
+      \includegraphics[height=.55\textheight]{exa_ad_passes.pdf}
+    \end{column}
+  \end{columns}
+  \visible<2->{\smallskip
+    \scriptsize Forward primals (green) and reverse adjoints (red) propagate through the \emph{same typed tree}. \alert{Per-pattern sparsity is known at compile time} $\Rightarrow$ Jacobian + Hessian in COO directly, \alert{no coloring round}, GPU-friendly.
+  }
 \end{frame}
 
 % =============================================================
