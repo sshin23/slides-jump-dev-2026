@@ -251,39 +251,9 @@ optimize!(jm)                                # stay in JuMP, solve on GPU
   \end{onlyenv}
   \medskip
   \begin{itemize}
-  \item<3-> Both routes go through the same MOI bridge: \alert{recover patterns} from the scalar collection by \alert{bucketing matching expression heads} into templatized sums
+  \item<3-> Both routes share the same MOI bridge: bucket matching expression heads into templatized sums
+  \item<4-> Caveat: only \texttt{@constraint} / \texttt{@objective} are supported. \alert{\texttt{@NLconstraint} / \texttt{@NLobjective} are not}
   \end{itemize}
-\end{frame}
-
-\begin{frame}{Where the bridge breaks}
-  \begin{itemize}
-  \item JuMP lowers \texttt{@constraint(model, [i=1:N], ...)} to a flat scalar collection \alert{before} the model is submitted to MOI
-  \item<2-> Pattern information visible to the user is \alert{no longer visible} to MOI---the bridge recovers patterns only when scalar constraints happen to share an expression head
-  \item<3-> Heterogeneous indexed structure (e.g., variable-size sums per index, as in ACOPF power balance) does \alert{not} round-trip
-  \item<4-> Caveat for legacy JuMP code: only \texttt{@constraint} / \texttt{@objective} are supported; \alert{\texttt{@NLconstraint} / \texttt{@NLobjective} are not}
-  \end{itemize}
-  \medskip
-  \visible<5->{
-    \begin{center}
-      \it To get the full speedup we need to keep the pattern alive through model construction.
-    \end{center}
-  }
-\end{frame}
-
-% =============================================================
-\section{Why patterns matter}
-% =============================================================
-\begin{frame}{Large-scale NLPs have repetitive structure}
-  \begin{itemize}
-  \item NLPs in engineering / science / statistics routinely involve millions of variables and constraints
-  \item<2-> Yet their formulations fit on a few pages---the same \alert{algebraic pattern} repeats across spatial nodes, time steps, scenarios, data samples
-  \item<3-> ACOPF on a network with thousands of buses: only \alert{15 distinct algebraic patterns} \citep{shinAcceleratingOptimalPower2024}
-  \item<4-> Problem size is driven by the number of \alert{data points}, not the number of patterns
-  \item<5-> Most AMSs (AMPL, GAMS, JuMP) flatten this at construction time. Cost: redundant work, no SIMD parallelism over patterns, \alert{no path to native GPU evaluation}
-  \end{itemize}
-  \refbr{
-    \fullcite{shinAcceleratingOptimalPower2024}
-  }
 \end{frame}
 
 % =============================================================
@@ -321,79 +291,6 @@ optimize!(jm)                                # stay in JuMP, solve on GPU
   }
 \end{frame}
 
-\begin{frame}{Pattern--data separation, concretely}
-  \begin{itemize}
-  \item \alert{Pattern}: a single algebraic expression with free indices into variables, parameters, and a data point
-  \item<2-> \alert{Data iterator}: the collection of data points over which the pattern is evaluated
-  \item<3-> Model is stored as a small collection of \texttt{SIMDFunction}s---one per pattern---together with their data
-  \item<4-> Each \texttt{SIMDFunction} bundles: (i) the parameterized expression tree, (ii) compressor maps for the Jacobian/Hessian, (iii) offsets into the global output arrays
-  \item<5-> Constructed once at model compilation, immutable thereafter; updating $x$ or $\theta$ requires \alert{no recompilation}
-  \end{itemize}
-\end{frame}
-
-\begin{frame}{Worked example: Goddard rocket \citep{goddardMethodReachingExtreme1919}}
-  \small
-  \begin{align*}
-    \max\;& h_T \\
-    \text{s.t.}\;& h_t = h_{t-1} + \tfrac{\Delta t}{2}(v_t + v_{t-1}), && t=1,\dots,T \\
-    & v_t = v_{t-1} + \tfrac{\Delta t}{2}\!\left(\tfrac{\tau_t - D(h_t,v_t)}{m_t} - g(h_t) + \tfrac{\tau_{t-1} - D(h_{t-1},v_{t-1})}{m_{t-1}} - g(h_{t-1})\right), && t=1,\dots,T \\
-    & m_t = m_{t-1} - \tfrac{\Delta t}{2c}(\tau_t + \tau_{t-1}), && t=1,\dots,T \\
-    & h_0 = h^0,\; v_0 = 0,\; m_0 = m^0,\; m_T = m^f
-  \end{align*}
-  \begin{itemize}
-  \item<2-> Three dynamics constraints + boundary conditions = \alert{5 patterns}, regardless of $T$
-  \item<3-> As $T$ grows from $10^2$ to $10^6$, pattern count is \alert{fixed}; data-point count scales
-  \item<4-> Refining the discretization is a \alert{data} change, not a \alert{model} change
-  \end{itemize}
-  \refbr{
-    \fullcite{goddardMethodReachingExtreme1919}\\
-    \fullcite{dolanBenchmarkingOptimizationSoftware2001}
-  }
-\end{frame}
-
-\begin{frame}{Where ExaModels sits among AMSs with their own AD}
-  \begin{center}\small
-    \begin{tabular}{lllc}
-      \toprule
-      System & Language & AD strategy & Pattern-aware \\
-      \midrule
-      AMPL    & own            & ASL (built-in)            & no \\
-      GAMS    & own            & built-in                  & no \\
-      JuMP    & Julia          & reverse-mode on graph     & no \\
-      CasADi  & C++/Py/MATLAB  & source transform          & partial \\
-      GEKKO   & Python         & APMonitor backend         & no \\
-      Gravity & C++            & symbolic                  & yes \\
-      \midrule
-      \alert{ExaModels.jl} & Julia & \alert{type-stable per-pattern} & \alert{yes} \\
-      \bottomrule
-    \end{tabular}
-  \end{center}
-  \begin{itemize}
-  \item<2-> Two strategies preserve indexed structure: \alert{vectorization} (CasADi MX) and \alert{templatizing} (Gravity, ExaModels)
-  \item<3-> ExaModels = templatizing + Julia type-stable graph + KernelAbstractions.jl GPU portability
-  \item<4-> Neither CasADi nor Gravity supports GPU-native derivative evaluation
-  \end{itemize}
-\end{frame}
-
-% =============================================================
-\section{Two routes for JuMP users}
-% =============================================================
-\begin{frame}{Route A: native ExaModels API}
-  Five-step workflow:
-  \begin{enumerate}
-  \item \texttt{ExaCore()} --- a builder that progressively accumulates model information
-  \item<2-> \texttt{@add\_var(c, x, dims; start, lvar, uvar)} --- variable block with bounds and initial point
-  \item<3-> \texttt{@add\_obj(c, expr for i in data)} --- objective pattern + data iterator
-  \item<4-> \texttt{@add\_con(c, name, expr for i in data; lcon, ucon)} --- constraint pattern (named blocks for accessors)
-  \item<5-> \texttt{ExaModel(c)} --- compile to an \texttt{NLPModels.AbstractNLPModel}
-  \end{enumerate}
-  \medskip
-  \begin{itemize}
-  \item<6-> Also: \texttt{@add\_par} (parameters), \texttt{@add\_con!} (augment an existing constraint block), \texttt{@add\_expr} (shared subexpressions), \texttt{@register\_univariate}/\texttt{@register\_bivariate} (custom functions)
-  \item<7-> Consumable by Ipopt, KNITRO, MadNLP, Uno, Percival, DCISolver, FletcherPenaltySolver
-  \end{itemize}
-\end{frame}
-
 \begin{frame}[fragile]{Goddard rocket in ExaModels}
 \begin{lstlisting}
 using ExaModels, NLPModelsIpopt
@@ -420,7 +317,10 @@ result = ipopt(ExaModel(core))                        # CPU, via NLPModels
   \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{Route B: GenOpt.jl \citep{legatGenOptJl2025} --- stay in JuMP, keep patterns}
+% =============================================================
+\section{Stay in JuMP: GenOpt.jl}
+% =============================================================
+\begin{frame}[fragile]{GenOpt.jl \citep{legatGenOptJl2025} --- preserve patterns at JuMP-side construction}
   \texttt{GenOpt.jl} (Benoît Legat) packs ``groups of similar constraints / sums of similar terms'' into \alert{lightweight generators} that ExaModels can recognize.
 \begin{lstlisting}
 using GenOpt, JuMP, CUDA, MadNLP
@@ -447,27 +347,20 @@ optimize!(model)
 % =============================================================
 \section{Under the hood}
 % =============================================================
-\begin{frame}{Parameterized expression tree}
+\begin{frame}{Type-stable expression tree + coloring-free sparse AD}
+  \alert{\bfseries Parameterized expression tree}
   \begin{itemize}
-  \item Each pattern compiles to a \alert{type-stable} expression tree
-  \item<2-> Node types: \texttt{Var}, \texttt{DataIndexed}, \texttt{ParameterNode}, \texttt{Constant\{T\}}, \texttt{Node1}, \texttt{Node2}
-  \item<3-> Nested type parameterization $\Rightarrow$ Julia compiler specializes a dedicated evaluator per pattern
-  \item<4-> The same tree is evaluated and differentiated with \alert{different data and arguments}, no recompilation
-  \item<5-> Algebraic simplification at compile time via multiple dispatch
+  \item Each pattern compiles to a \alert{type-stable} graph; Julia compiler specializes a dedicated evaluator per pattern
+  \item<2-> Same tree, different data and arguments, \alert{no recompilation}
   \end{itemize}
-\end{frame}
-
-\begin{frame}{Coloring-free sparse AD}
+  \medskip
+  \visible<3->{
+  \alert{\bfseries Coloring-free sparse AD}
   \begin{itemize}
-  \item Standard sparse reverse-mode AD requires \alert{graph coloring} to reuse adjoint passes across nonzero columns
-  \item<2-> Coloring is GPU-unfriendly: irregular control flow, dynamic dispatch
-  \item<3-> ExaModels: \alert{a priori} sparsity analysis per pattern at model-construction time
-    \begin{itemize}
-    \item Relative index sequence of nonzeros within each pattern is compressed into a compact mapping
-    \item Sparse Jacobian and Lagrangian Hessian in COO directly, no coloring round
-    \end{itemize}
-  \item<4-> First-order: adjoint tree (\texttt{drpass}, \texttt{grpass}). Second-order: second-adjoint tree (\texttt{hrpass}, \texttt{hdrpass}, \texttt{hrpass0})
+  \item Standard sparse reverse-mode AD uses \alert{graph coloring}---GPU-unfriendly (irregular control flow, dynamic dispatch)
+  \item<4-> ExaModels: \alert{a priori} sparsity analysis per pattern $\Rightarrow$ sparse Jacobian + Lagrangian Hessian in \alert{COO directly, no coloring round}
   \end{itemize}
+  }
 \end{frame}
 
 % =============================================================
@@ -526,43 +419,15 @@ optimize!(model)
 \end{frame}
 
 % =============================================================
-\section{Beyond JIT}
-% =============================================================
-\begin{frame}{Ahead-of-time compilation \& numeric precision}
-  \begin{itemize}
-  \item \alert{No runtime code generation in the hot path} --- the model evaluation surface is pure type-stable Julia
-  \item<2-> Compatible with \texttt{juliac --trim=safe} for AOT binaries; \texttt{NLPModelsIpoptLite.jl} demonstrates the end-to-end path
-  \item<3-> Same code paths serve JIT and AOT --- no separate codegen step (unlike CasADi)
-  \item<4-> Generic numeric precision: Float32, Float64, \texttt{DoubleFloats}, user-defined types --- \texttt{replace\_T} swaps the scalar type
-  \end{itemize}
-\end{frame}
-
-\begin{frame}{Extensions: parametric, two-stage stochastic, batch}
-  \begin{itemize}
-  \item \alert{Parametric problems}: \texttt{set\_value!} updates problem data without model reconstruction --- key for MPC / parameter sweeps
-  \item<2-> \alert{Two-stage stochastic}: \texttt{TwoStageExaCore} + \texttt{EachScenario()}; first-stage variables shared, second-stage replicated across scenarios
-  \item<3-> \alert{Batch models}: \texttt{BatchExaCore} stores independent NLP instances as columns of a matrix; \texttt{FlatNLPModel} exposes a single callback API to the solver
-  \item<4-> All three reuse the same SIMD abstraction + AD machinery
-  \end{itemize}
-\end{frame}
-
-% =============================================================
 \section{Numerical results}
 % =============================================================
-\begin{frame}{Benchmarks: CPU vs JuMP vs AMPL}{Luk\v{s}an--Vlc\v{e}k, COPS, PGLIB-OPF}
+\begin{frame}{Benchmarks}{Luk\v{s}an--Vlc\v{e}k, COPS, PGLIB-OPF}
   \begin{itemize}
-  \item Benchmark suites with ExaModels-native implementations:
-    \texttt{LuksanVlcekBenchmark.jl}, \texttt{COPSBenchmark.jl}, \texttt{ExaModelsPower.jl}
-  \item<2-> Function and derivative evaluation timing (AD layer only --- no solver)
-  \item<3-> \alert{Result placeholder} --- table from paper \S 9.2 to be inserted
-  \end{itemize}
-\end{frame}
-
-\begin{frame}{GPU acceleration across five backends}
-  \begin{itemize}
-  \item Same model code, five execution targets: CUDA, ROCm, oneAPI, Metal, CPU-8T
-  \item<2-> Up to \alert{two orders of magnitude} acceleration over the CPU baseline on large instances
-  \item<3-> \alert{Plot placeholder} --- scaling plot from paper \S 9.3 to be inserted
+  \item ExaModels-native suites: \texttt{LuksanVlcekBenchmark.jl}, \texttt{COPSBenchmark.jl}, \texttt{ExaModelsPower.jl}
+  \item<2-> \alert{CPU}: ExaModels vs JuMP vs AMPL --- function + derivative evaluation timing (AD layer only)
+  \item<3-> \alert{GPU}: same model code on CUDA, ROCm, oneAPI, Metal, OpenCL; CPU-8T baseline
+  \item<4-> Up to \alert{two orders of magnitude} acceleration over CPU baseline on large instances
+  \item<5-> \alert{Plot / table placeholders} --- to be lifted from paper \S 9.2--9.3
   \end{itemize}
 \end{frame}
 
@@ -597,18 +462,6 @@ optimize!(model)
   \tikz[text width=1.1\textwidth,xscale=.9,transform shape]{
     \node at (current page.center) {\printbibliography[heading=none]};
   }
-\end{frame}
-
-\begin{frame}{}
-  \joint{
-    Joint work with:
-    Fran\c{c}ois Pacaud (MINES Paris-PSL),
-    Alexis Montoison (AMD),
-    Michel Schanen (Argonne),
-    Mihai Anitescu (Argonne)
-  }
-  \thispagestyle{empty}
-  \titlepage
 \end{frame}
 
 \end{document}
