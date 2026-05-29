@@ -239,7 +239,7 @@
       \item Solver \alert{can iterate entirely on the device}
       \item Solution copied \alert{once back} to CPU
       \item Transfers can be an overhead, but the cost is \alert{amortized} over many solver iterations
-      \item \alert{Existing GPU-native solvers} in this class already work this way: \texttt{CuClarabel}, \texttt{cuPDLP+}~\citep{luCuPDLPFurtherEnhanced2025}
+      \item \alert{Existing GPU-native solvers} in this class already work this way: \texttt{CuClarabel}, \texttt{cuPDLP+}
       \item[]<2-> $\Rightarrow$ For LP / QP / DCP, a \alert{GPU-native modeling language may not add much value}
       \end{itemize}
     \end{column}
@@ -267,6 +267,7 @@
       \end{tikzpicture}
     \end{column}
   \end{columns}
+  \refbr{\fullcite{luCuPDLPFurtherEnhanced2025}}
 \end{frame}
 
 \begin{frame}{Why a GPU-compatible modeling language?}{NLP --- the picture is different}
@@ -351,13 +352,28 @@
   \end{itemize}
 \end{frame}
 
+% =============================================================
+\section{Where the gap comes from}
+% =============================================================
+\begin{frame}[fragile]{Where the gap comes from: JuMP unrolls into a type-erased array}
+  \scriptsize
+  \lstinputlisting{code/07_typestable_jump.jl}
+  \lstinputlisting[style=darkrepl]{code/07_typestable_jump_repl.txt}
+  \medskip
+  \normalsize
+  \begin{itemize}\itemsep1pt
+  \item JuMP \alert{unrolls the expression at construction} into a flat array of operators / operands
+  \item<2-> The array is \texttt{Vector\{Any\}} --- the algebraic structure lives only in the \alert{runtime element types}, not in the array's static type
+  \item<3-> Every conversion to ExaModels walks each node and pays \alert{type inference} per element $\Rightarrow$ that cost dominates the JuMP $\to$ ExaModels build
+  \end{itemize}
+\end{frame}
 
 % =============================================================
 \section{One remedy: hijack JuMP syntax (GenOpt.jl)}
 % =============================================================
 \begin{frame}[fragile]{One remedy: hijack the JuMP syntax (\texttt{GenOpt.jl} \citep{legatGenOptJl2025})}
   \begin{tikzpicture}[remember picture, overlay]
-    \node[anchor=north east, xshift=-0.4cm, yshift=-1.1cm] at (current page.north east) {%
+    \node[anchor=north east, xshift=-0.15cm, yshift=-0.15cm] at (current page.north east) {%
       \begin{tabular}{c}\scriptsize
         \includegraphics[width=0.55in]{blegat.png}\\
         {\color{mitdarkgray}\texttt{@blegat}}
@@ -500,8 +516,9 @@ optimize!(model)
   \item ExaModels offers a \alert{SIMD abstraction} for NLPs---an alternative to vectorization that preserves indexed structure through (pattern, data iterator) pairs
   \item<2-> Type-stable parameterized expression tree + coloring-free sparse AD make \alert{GPU-native} derivative evaluation practical
   \item<3-> One model, six KA.jl backends, no code change
-  \item<4-> Already the modeling layer for MadNLP's GPU-native interior-point methods \citep{pacaudCondensedspaceMethodsNonlinear2024}
+  \item<4-> Already the modeling layer for MadNLP's GPU-native interior-point methods
   \end{itemize}
+  \refbr{\fullcite{pacaudCondensedspaceMethodsNonlinear2024}}
   \medskip
   \visible<5->{
     \begin{block}{Discussion --- and continuing this thread}
