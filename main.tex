@@ -294,15 +294,18 @@
 \begin{frame}[fragile]{The ExaModels JuMP Interface}{Status Quo}
   \scriptsize
   \lstinputlisting{code/05_interface_snippet.jl}
-  \smallskip
+  \medskip
   \small
   Bridge supports \texttt{@constraint} / \texttt{@objective} only (\alert{not legacy \texttt{@NLconstraint} / \texttt{@NLobjective}}).
+\end{frame}
+
+\begin{frame}[fragile]{Model-build cost}{JuMP route vs native ExaModels, Rosenbrock at $N=10^5$ on this desktop}
+  \lstinputlisting[language={}, basicstyle=\ttfamily\small, backgroundcolor=\color{mitlightgray!30}, frame=single, framerule=0pt, framesep=6pt, xleftmargin=6pt, xrightmargin=6pt]{code/05_timing_repl.txt}
   \medskip
   \visible<2->{
-  \begin{block}{Model-build cost (Rosenbrock at $N=10^5$; this desktop)}
-    \centering
-    JuMP route \alert{$\sim 1.74$\,s} vs native ExaModels \alert{$\sim 0.44$\,ms} \;---\; \alert{$\sim 4000\times$ gap}, growing with $N$.
-  \end{block}
+    \begin{block}{Punchline}
+      $\sim$\,\alert{6700$\times$ faster} build, $\sim$\,\alert{360{,}000$\times$ fewer allocations}, $\sim$\,\alert{340$\times$ less memory}. The gap grows with $N$.
+    \end{block}
   }
 \end{frame}
 

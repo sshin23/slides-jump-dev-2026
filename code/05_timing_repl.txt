@@ -1,0 +1,5 @@
+julia> @btime ExaModel(jump_rosenbrock(10^5));
+  2.104 s (28307923 allocations: 1.06 GiB)
+
+julia> @btime exa_rosenbrock(10^5);
+  313.313 us (78 allocations: 3.13 MiB)
