@@ -390,16 +390,11 @@
   \item MadNLP + MadNLPGPU is the GPU IPM consumer \citep{shinMadNLPjl2025,pacaudCondensedspaceMethodsNonlinear2024}
   \end{itemize}
   \smallskip
-  \alert{\bfseries Recently simplified}
-  \begin{itemize}\itemsep1pt
-  \item<2-> ExaModels.jl \href{https://github.com/exanauts/ExaModels.jl/pull/282}{\#282} (M.~Schanen, 2026-05-28): drop \texttt{ExaModelsMadNLP} / \texttt{ExaModelsIpopt} extensions $\Rightarrow$ \alert{NLPModels API directly}. Breaking: \texttt{MadNLPOptimizer} removed
-  \end{itemize}
-  \smallskip
   \alert{\bfseries Open}
   \begin{itemize}\itemsep1pt
-  \item<3-> \texttt{@NLconstraint} / \texttt{@NLobjective} not supported by the bridge
-  \item<4-> Heterogeneous indexed structure does not round-trip $\Rightarrow$ use GenOpt.jl or native
-  \item<5-> OpenCL / oneAPI backends held by a GPUCompiler pin (upstream SPIR-V issue)
+  \item<2-> \texttt{@NLconstraint} / \texttt{@NLobjective} not supported by the bridge
+  \item<3-> Heterogeneous indexed structure does not round-trip $\Rightarrow$ use GenOpt.jl or native
+  \item<4-> OpenCL / oneAPI backends held by a GPUCompiler pin (upstream SPIR-V issue)
   \end{itemize}
 \end{frame}
 
