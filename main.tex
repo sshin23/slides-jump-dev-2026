@@ -218,8 +218,9 @@
       \item Canonical forms ($A, b, c$, ...) $\Rightarrow$ \alert{one-shot CPU$\to$GPU copy} of problem data
       \item Solver \alert{can iterate entirely on the device}
       \item Solution copied \alert{once back} to CPU
-      \item These transfers can be a \alert{significant overhead}, but the cost is \alert{amortized} over many solver iterations
+      \item Transfers can be an overhead, but the cost is \alert{amortized} over many solver iterations
       \item \alert{Existing GPU-native solvers} in this class already work this way: \texttt{CuClarabel}, \texttt{cuPDLP+}~\citep{luCuPDLPFurtherEnhanced2025}
+      \item<2-> $\Rightarrow$ For LP / QP / DCP, a \alert{GPU-native modeling language may not add much value}
       \end{itemize}
     \end{column}
     \begin{column}{.40\textwidth}
