@@ -201,29 +201,37 @@
 % =============================================================
 \begin{frame}{Why a GPU-compatible modeling language?}{LP / QP / conic / DCP --- not strictly needed}
   \begin{columns}[c]
-    \begin{column}{.62\textwidth}
+    \begin{column}{.58\textwidth}
       \begin{itemize}
       \item Canonical forms ($A, b, c$, cone description) $\Rightarrow$ \alert{one-shot CPU$\to$GPU copy} of problem data
       \item Solver \alert{can iterate entirely on the device}
       \item Solution copied \alert{once back} to CPU
-      \item These transfers \alert{can be costly}, but the cost is \alert{amortized} over many solver iterations
+      \item These transfers can be a \alert{significant overhead}, but the cost is \alert{amortized} over many solver iterations
       \end{itemize}
     \end{column}
-    \begin{column}{.36\textwidth}
+    \begin{column}{.40\textwidth}
       \centering
-      \begin{tikzpicture}[
-        every node/.style={font=\scriptsize, align=center},
-        host/.style={draw=mitdarkgray, rounded corners=2pt, fill=mitlightgray!40, minimum width=2.6cm, minimum height=0.9cm, inner sep=2pt},
-        dev/.style={draw=mitred, rounded corners=2pt, fill=mitred!15, minimum width=2.6cm, minimum height=0.9cm, inner sep=2pt},
-      ]
-        \node[host] (cpu) at (0, 2.0) {\textbf{CPU}\\host memory};
-        \node[dev]  (gpu) at (0, 0)   {\textbf{GPU}\\device memory};
-        \draw[->, very thick, mitred] ([xshift=-5mm]cpu.south) -- ([xshift=-5mm]gpu.north)
-          node[midway, left=1pt, font=\tiny, color=mitdarkgray, align=right]
-          {problem\\(once)};
-        \draw[->, very thick, mitred] ([xshift=5mm]gpu.north) -- ([xshift=5mm]cpu.south)
-          node[midway, right=1pt, font=\tiny, color=mitdarkgray, align=left]
-          {solution\\(once)};
+      \begin{tikzpicture}[every node/.style={font=\scriptsize, align=center}]
+        % CPU chip
+        \filldraw[draw=mitdarkgray, fill=mitlightgray!30, line width=0.8pt, rounded corners=1pt]
+          (-0.9, 2.0) rectangle (0.9, 2.8);
+        \node[font=\bfseries, color=mitdarkgray] at (0, 2.4) {CPU};
+        % GPU card
+        \filldraw[draw=mitred, fill=mitred!15, line width=0.8pt, rounded corners=2pt]
+          (-1.2, -0.4) rectangle (1.2, 0.4);
+        \foreach \cx in {-0.75, 0.75} {
+          \draw[mitred, line width=0.6pt, fill=white] (\cx, 0.0) circle (0.22);
+          \draw[mitred, line width=0.5pt] (\cx - 0.16, 0.0) -- (\cx + 0.16, 0.0);
+          \draw[mitred, line width=0.5pt] (\cx, -0.16) -- (\cx, 0.16);
+        }
+        \node[font=\bfseries, color=mitred] at (0, 0) {GPU};
+        % arrows
+        \draw[->, very thick, mitred] (-0.45, 1.95) -- (-0.45, 0.45);
+        \node[font=\tiny, color=mitdarkgray, anchor=east, align=right] at (-0.5, 1.2) {problem\\(once)};
+        \draw[->, very thick, mitred] (0.45, 0.45) -- (0.45, 1.95);
+        \node[font=\tiny, color=mitdarkgray, anchor=west, align=left] at (0.5, 1.2) {solution\\(once)};
+        % PCIe label
+        \node[font=\tiny\bfseries, color=mitdarkgray, fill=white, inner sep=2pt] at (0, 1.2) {PCIe / SXM};
       \end{tikzpicture}
     \end{column}
   \end{columns}
@@ -231,34 +239,43 @@
 
 \begin{frame}{Why a GPU-compatible modeling language?}{NLP --- the picture is different}
   \begin{columns}[c]
-    \begin{column}{.62\textwidth}
+    \begin{column}{.58\textwidth}
       \begin{itemize}\itemsep2pt
       \item Solver \alert{queries the modeling layer at every iteration} for
         $f(x),\; g(x),\; \nabla f(x),\; \nabla g(x),\; \nabla^2_{xx} L(x,\lambda)$
       \item Each query depends on the current iterate---\alert{no one-shot transfer}
-      \item Without GPU-native callbacks, every iteration pays a CPU$\leftrightarrow$GPU round-trip: \alert{per-iteration cost, not amortized}
+      \item Without GPU-native callbacks, every iteration pays a CPU$\leftrightarrow$GPU round-trip: \alert{significant per-iteration overhead, no amortization}
       \item<2-> JuMP today does \alert{not} emit GPU-native callbacks. Fine: modeling infrastructure stays on CPU, \alert{as long as the callbacks themselves run on the device}
       \end{itemize}
     \end{column}
-    \begin{column}{.36\textwidth}
+    \begin{column}{.40\textwidth}
       \centering
-      \begin{tikzpicture}[
-        every node/.style={font=\scriptsize, align=center},
-        host/.style={draw=mitdarkgray, rounded corners=2pt, fill=mitlightgray!40, minimum width=4.4cm, minimum height=0.6cm, inner sep=2pt},
-        dev/.style={draw=mitred, rounded corners=2pt, fill=mitred!15, minimum width=4.4cm, minimum height=0.6cm, inner sep=2pt},
-      ]
-        \node[host] (cpu) at (0, 2.5) {\textbf{CPU} host memory};
-        \node[dev]  (gpu) at (0, 0)   {\textbf{GPU} device memory};
-        \foreach \i in {0,1,2,3,4} {
-          \pgfmathsetmacro{\x}{-1.6 + 0.8*\i}
-          \draw[<->, thick, mitred] (\x, 2.15) -- (\x, 0.65);
+      \begin{tikzpicture}[every node/.style={font=\scriptsize, align=center}]
+        % CPU chip (wider)
+        \filldraw[draw=mitdarkgray, fill=mitlightgray!30, line width=0.8pt, rounded corners=1pt]
+          (-1.25, 2.35) rectangle (1.25, 3.05);
+        \node[font=\bfseries, color=mitdarkgray] at (0, 2.7) {CPU};
+        % GPU card (wider)
+        \filldraw[draw=mitred, fill=mitred!15, line width=0.8pt, rounded corners=2pt]
+          (-1.25, -0.4) rectangle (1.25, 0.4);
+        \foreach \cx in {-0.9, 0.9} {
+          \draw[mitred, line width=0.6pt, fill=white] (\cx, 0.0) circle (0.2);
+          \draw[mitred, line width=0.5pt] (\cx - 0.14, 0.0) -- (\cx + 0.14, 0.0);
+          \draw[mitred, line width=0.5pt] (\cx, -0.14) -- (\cx, 0.14);
         }
+        \node[font=\bfseries, color=mitred] at (0, 0) {GPU};
+        % five bidirectional arrows
         \foreach \i in {0,1,2,3,4} {
-          \pgfmathsetmacro{\x}{-1.6 + 0.8*\i}
-          \node[font=\footnotesize\bfseries, color=mitred] at (\x, 0.42) {\i};
+          \pgfmathsetmacro{\x}{-1.0 + 0.5*\i}
+          \draw[<->, thick, mitred] (\x, 2.3) -- (\x, 0.45);
         }
-        \node[font=\footnotesize\bfseries, color=mitred] at (2.05, 0.42) {$\cdots$};
-        \node[font=\scriptsize, color=mitdarkgray, anchor=east] at (-2.0, 0.42) {iter:};
+        % iter labels (in the white band between arrows)
+        \foreach \i in {0,1,2,3,4} {
+          \pgfmathsetmacro{\x}{-1.0 + 0.5*\i}
+          \node[font=\footnotesize\bfseries, color=mitred, fill=white, inner sep=1pt] at (\x, 1.35) {\i};
+        }
+        \node[font=\footnotesize\bfseries, color=mitred, fill=white, inner sep=1pt] at (1.35, 1.35) {$\cdots$};
+        \node[font=\scriptsize, color=mitdarkgray, anchor=east] at (-1.15, 1.35) {iter:};
       \end{tikzpicture}
     \end{column}
   \end{columns}
