@@ -199,42 +199,59 @@
 % =============================================================
 \section{Why GPU-native modeling, only for NLPs?}
 % =============================================================
-\begin{frame}{Why a GPU-compatible modeling language?}
-  \small
-  \alert{\bfseries LP / QP / conic / SDP --- not strictly needed}
-  \begin{itemize}\itemsep1pt
-  \item Canonical forms (cost vector, constraint matrix, cone description) $\Rightarrow$ \alert{one-shot CPU$\to$GPU copy}
-  \item Solver then iterates \alert{entirely on the device}; transfer cost \alert{amortized} over many iterations
-  \end{itemize}
-  \medskip
-  \visible<2->{
-  \alert{\bfseries NLP --- the picture is different}
-  \begin{columns}[T]
-    \begin{column}{.72\textwidth}
-      \begin{itemize}\itemsep1pt
+\begin{frame}{Why a GPU-compatible modeling language?}{LP / QP / conic / SDP --- not strictly needed}
+  \begin{columns}[c]
+    \begin{column}{.62\textwidth}
+      \begin{itemize}
+      \item These classes have \alert{canonical forms}: cost vector, constraint matrix, cone description
+      \item Build the data on CPU, transfer once: \alert{a one-shot copy}
+      \item The solver then iterates \alert{entirely on the device}
+      \item Transfer cost is \alert{amortized} over many solver iterations---negligible
+      \end{itemize}
+    \end{column}
+    \begin{column}{.36\textwidth}
+      \centering
+      \begin{tikzpicture}[
+        every node/.style={font=\scriptsize, align=center},
+        host/.style={draw=mitdarkgray, rounded corners=2pt, fill=mitlightgray!40, minimum width=2.6cm, minimum height=0.9cm, inner sep=2pt},
+        dev/.style={draw=mitred, rounded corners=2pt, fill=mitred!15, minimum width=2.6cm, minimum height=0.9cm, inner sep=2pt},
+      ]
+        \node[host] (cpu) at (0, 2.0) {\textbf{CPU}\\host memory\\{\tiny build $A,b,c$}};
+        \node[dev]  (gpu) at (0, 0)   {\textbf{GPU}\\device memory\\{\tiny solver iterates here}};
+        \draw[->, very thick, mitred] (cpu) -- (gpu)
+          node[midway, right=2pt, font=\tiny, color=mitdarkgray, align=left]
+          {one-shot\\copy};
+      \end{tikzpicture}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Why a GPU-compatible modeling language?}{NLP --- the picture is different}
+  \begin{columns}[c]
+    \begin{column}{.62\textwidth}
+      \begin{itemize}\itemsep2pt
       \item Solver \alert{queries the modeling layer at every iteration} for
         $f(x),\; g(x),\; \nabla f(x),\; \nabla g(x),\; \nabla^2_{xx} L(x,\lambda)$
       \item Each query depends on the current iterate---\alert{no one-shot transfer}
       \item Without GPU-native callbacks, every iteration pays a CPU$\leftrightarrow$GPU round-trip: \alert{per-iteration cost, not amortized}
-      \item JuMP today does \alert{not} emit GPU-native callbacks. That's fine: modeling infrastructure stays on CPU, \alert{as long as the callbacks themselves run on the device}
+      \item<2-> JuMP today does \alert{not} emit GPU-native callbacks. Fine: modeling infrastructure stays on CPU, \alert{as long as the callbacks themselves run on the device}
       \end{itemize}
     \end{column}
-    \begin{column}{.26\textwidth}
+    \begin{column}{.36\textwidth}
       \centering
       \begin{tikzpicture}[
         every node/.style={font=\scriptsize, align=center},
-        host/.style={draw=mitdarkgray, rounded corners=2pt, fill=mitlightgray!40, minimum width=2.2cm, minimum height=0.7cm, inner sep=2pt},
-        dev/.style={draw=mitred, rounded corners=2pt, fill=mitred!15, minimum width=2.2cm, minimum height=0.7cm, inner sep=2pt},
+        host/.style={draw=mitdarkgray, rounded corners=2pt, fill=mitlightgray!40, minimum width=2.6cm, minimum height=0.9cm, inner sep=2pt},
+        dev/.style={draw=mitred, rounded corners=2pt, fill=mitred!15, minimum width=2.6cm, minimum height=0.9cm, inner sep=2pt},
       ]
-        \node[host] (cpu) at (0, 1.3) {\textbf{CPU}\\host memory};
+        \node[host] (cpu) at (0, 2.0) {\textbf{CPU}\\host memory};
         \node[dev]  (gpu) at (0, 0)   {\textbf{GPU}\\device memory};
-        \draw[<->, thick, mitred] (cpu) -- (gpu)
+        \draw[<->, very thick, mitred] (cpu) -- (gpu)
           node[midway, right=2pt, font=\tiny, color=mitdarkgray, align=left]
-          {each\\iter:\\$x,\,f,\,g,$\\$\nabla f,\,\dots$};
+          {each iter:\\$x,\,f,\,g,$\\$\nabla f,\,\nabla g,$\\$\nabla^2 L$};
       \end{tikzpicture}
     \end{column}
   \end{columns}
-  }
 \end{frame}
 
 % =============================================================
