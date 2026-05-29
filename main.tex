@@ -349,30 +349,27 @@ optimize!(model)
 
 
 % =============================================================
-\section{Why? JuMP expressions are type-erased}
+\section{The expression tree is encoded in the type}
 % =============================================================
-\begin{frame}[fragile]{Root cause: JuMP stores expressions in non-concrete types}
-  \scriptsize
-  Same nonlinear expression on both sides --- $x^2 + \sin(x)\,y + \cos(y)$.
+\begin{frame}[fragile]{ExaModels: the type \emph{is} the tree}
   \begin{columns}[T]
-    \begin{column}{.49\textwidth}
-      \alert{\bfseries JuMP}
-      \lstinputlisting{code/07_typestable_jump.jl}
-      \smallskip
-      \lstinputlisting[language={}, basicstyle=\ttfamily\scriptsize, backgroundcolor=\color{white}, frame=none, xleftmargin=0pt, xrightmargin=0pt, aboveskip=0pt, belowskip=0pt]{code/07_typestable_jump_repl.txt}
-    \end{column}
-    \begin{column}{.49\textwidth}
-      \alert{\bfseries ExaModels}
+    \begin{column}{.55\textwidth}
+      \scriptsize
+      \alert{\bfseries Math.} Per-term Rosenbrock pattern:\\[2pt]
+      $\displaystyle f_i(x) = 100\,(x_{i-1}^2 - x_i)^2 + (x_{i-1} - 1)^2$
+      \par\medskip
+      \alert{\bfseries Code.}\par
       \lstinputlisting{code/07_typestable_exa.jl}
-      \smallskip
-      \lstinputlisting[language={}, basicstyle=\ttfamily\scriptsize, backgroundcolor=\color{white}, frame=none, xleftmargin=0pt, xrightmargin=0pt, aboveskip=0pt, belowskip=0pt]{code/07_typestable_exa_repl.txt}
+      \alert{\bfseries Julia REPL.}\par
+      \lstinputlisting[language={}, basicstyle=\ttfamily\tiny, backgroundcolor=\color{white}, frame=none, xleftmargin=0pt, xrightmargin=0pt, aboveskip=0pt, belowskip=0pt]{code/07_typestable_exa_repl.txt}
+    \end{column}
+    \begin{column}{.43\textwidth}
+      \centering
+      \includegraphics[height=.55\textheight]{exa_expression_tree.pdf}
     \end{column}
   \end{columns}
-  \medskip
-  \visible<2->{
-  \begin{block}{Why the bridge is slow}
-    \small JuMP's expression args are \alert{\texttt{Vector\{Any\}}} --- iterating pays \alert{per-element type inference + dynamic dispatch}. ExaModels' tree encodes the operator into the type (\texttt{Node2\{+,\dots\}}, \texttt{Node1\{cos,\dots\}}), so the Julia compiler dispatches statically and inlines.
-  \end{block}
+  \visible<2->{\smallskip
+    \scriptsize\alert{The structure of the expression is fully encoded in the type.} Julia compiler dispatches statically all the way down --- no runtime type inference, no dynamic dispatch.
   }
 \end{frame}
 
