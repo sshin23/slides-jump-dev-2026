@@ -396,9 +396,9 @@ optimize!(model)
 \end{frame}
 
 % =============================================================
-\section{Other nice things about ExaModels}
+\section{Benefits of encoding the algebraic structure in the type}
 % =============================================================
-\begin{frame}{Other nice things about ExaModels}
+\begin{frame}{Benefits of encoding the algebraic structure in the type}
   \begin{itemize}\itemsep4pt
   \item \alert{\bfseries Portability}: same model code on \texttt{CPU()}, \texttt{CUDABackend()}, \texttt{ROCBackend()}, \texttt{OneAPIBackend()}, \texttt{MetalBackend()}, \texttt{OpenCLBackend()} --- one backend keyword switches hardware.
   \item<2-> \alert{\bfseries Performance}: type-stable end-to-end $\Rightarrow$ Julia compiler inlines AD code per pattern; matches or beats AMPL / JuMP on CPU before any GPU is involved.
