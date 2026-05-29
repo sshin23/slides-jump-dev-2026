@@ -227,8 +227,6 @@
       \end{tikzpicture}
     \end{column}
   \end{columns}
-  \vfill
-  {\tiny\itshape\color{mitdarkgray} Cartoon depicts only the large problem-data transfers (e.g., matrix factors). GPU kernels themselves are launched from CPU regardless.}
 \end{frame}
 
 \begin{frame}{Why a GPU-compatible modeling language?}{NLP --- the picture is different}
@@ -260,13 +258,10 @@
           \node[font=\footnotesize\bfseries, color=mitred] at (\x, 0.42) {\i};
         }
         \node[font=\footnotesize\bfseries, color=mitred] at (2.05, 0.42) {$\cdots$};
-        \node[font=\scriptsize\itshape, color=mitdarkgray, anchor=east] at (-2.0, 0.42) {iter:};
-        \node[font=\tiny\itshape, color=mitdarkgray] at (0, -0.55) {transfer each iter: $f,\, g,\, \nabla f,\, \nabla g,\, \nabla^2 L$};
+        \node[font=\scriptsize, color=mitdarkgray, anchor=east] at (-2.0, 0.42) {iter:};
       \end{tikzpicture}
     \end{column}
   \end{columns}
-  \vfill
-  {\tiny\itshape\color{mitdarkgray} Cartoon depicts only the large problem-data transfers. GPU kernels themselves are launched from CPU regardless.}
 \end{frame}
 
 % =============================================================
