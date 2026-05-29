@@ -364,19 +364,25 @@ result = ipopt(ExaModel(core))                        # CPU, via NLPModels
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Route B: GenOpt.jl \citep{legatGenOptJl2025} --- stay in JuMP, keep patterns}
+\begin{frame}[fragile]{Route B: GenOpt.jl \citep{legatGenOptJl2025} --- stay in JuMP, keep patterns}
+  \texttt{GenOpt.jl} (Benoît Legat) packs ``groups of similar constraints / sums of similar terms'' into \alert{lightweight generators} that ExaModels can recognize.
+\begin{lstlisting}
+using GenOpt, JuMP, CUDA, MadNLP
+
+@constraint(model, [i in 1:n], x[1,i] == x0[i],
+    container = ParametrizedArray)                            # grouped constraint
+
+@objective(model, Min,
+    lazy_sum(0.5 * R[j] * u[i,j]^2 for i in 1:N, j in 1:p))   # grouped sum
+
+set_optimizer(model, () -> GenOpt.ExaOptimizer(madnlp, CUDABackend()))
+optimize!(model)
+\end{lstlisting}
   \begin{itemize}
-  \item \texttt{GenOpt.jl} is an actively developed \alert{JuMP extension} adding constraint and term \emph{generators}
-  \item<2-> Generators express indexed families as \alert{first-class objects}, not as scalar collections
-  \item<3-> Patterns are preserved at \alert{JuMP-side construction}---ExaModels receives them \alert{intact}
-  \item<4-> No model rewrite for existing JuMP users: swap \texttt{@constraint(model, [i=1:N], ...)} for the generator form
+  \item<2-> Patterns are preserved at \alert{JuMP-side construction}---ExaModels receives them \alert{intact} (no scalar enumeration)
+  \item<3-> Minimal model rewrite: add the \texttt{container} keyword / wrap sums in \texttt{lazy\_sum}
+  \item<4-> Originally presented at JuMP-dev 2025
   \end{itemize}
-  \medskip
-  \visible<5->{
-    \begin{block}{Recommendation for JuMP users today}
-      Route A when starting fresh; Route B (GenOpt.jl + ExaModelsMOI.jl) to retrofit existing JuMP code without leaving the JuMP ecosystem.
-    \end{block}
-  }
   \refbr{
     \fullcite{legatGenOptJl2025}
   }
@@ -432,6 +438,34 @@ result = ipopt(ExaModel(core))                        # CPU, via NLPModels
   \refbr{
     \fullcite{churavyKernelAbstractionsjl2025}\\
     \fullcite{shinMadNLPjl2025}
+  }
+\end{frame}
+
+% =============================================================
+\section{Where ExaModels--JuMP stands today}
+% =============================================================
+\begin{frame}{Status quo, May 2026}
+  \alert{\bfseries Working today}
+  \begin{itemize}
+  \item Direct conversion \texttt{ExaModel(jm; backend = ...)} via the \texttt{ExaModelsJuMP} extension
+  \item \texttt{set\_optimizer(jm, () -> ExaModels.Optimizer(...))} for stay-in-JuMP workflows
+  \item GenOpt.jl \citep{legatGenOptJl2025} for pattern-preserving JuMP authoring
+  \item MadNLP + MadNLPGPU as the GPU IPM consumer \citep{shinMadNLPjl2025,pacaudCondensedspaceMethodsNonlinear2024}
+  \end{itemize}
+  \medskip
+  \alert{\bfseries Recently simplified}
+  \begin{itemize}
+  \item<2-> ExaModels.jl \href{https://github.com/exanauts/ExaModels.jl/pull/282}{\#282} (merged 2026-05-28, M.~Schanen): drop \texttt{ExaModelsMadNLP} / \texttt{ExaModelsIpopt} extensions; \alert{go through NLPModels API directly}. Breaking change: the \texttt{MadNLPOptimizer} constructor was removed
+  \end{itemize}
+  \medskip
+  \alert{\bfseries Open}
+  \begin{itemize}
+  \item<3-> Legacy \texttt{@NLconstraint} / \texttt{@NLobjective} not supported by the bridge
+  \item<4-> Heterogeneous indexed structure (variable-size sums per index) does not round-trip through MOI bucketing---use GenOpt.jl or native ExaModels
+  \item<5-> GPU portability is real but constrained by upstream: GPUCompiler is currently pinned to \texttt{1.11} (OpenCL/oneAPI SPIR-V validation issue)
+  \end{itemize}
+  \refbr{
+    \fullcite{legatGenOptJl2025}
   }
 \end{frame}
 
