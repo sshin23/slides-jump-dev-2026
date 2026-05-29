@@ -439,6 +439,19 @@ optimize!(model)
   \end{itemize}
 \end{frame}
 
+% =============================================================
+\section{Numerical results}
+% =============================================================
+\begin{frame}{Benchmarks}{AD-callback speedup vs CPU-1T baseline, AC OPF (PGLIB-OPF), 4 backends}
+  \centering
+  \includegraphics[width=\textwidth]{exa_backend_scaling.pdf}
+  \begin{itemize}
+  \item<2-> Jacobian / Hessian on CUDA, AMDGPU reach \alert{$>100\times$} at $n_{\text{var}} \sim 10^6$
+  \item<3-> \texttt{obj} / \texttt{cons} sit closer to parity: small per-call work, GPU-launch dominated
+  \item<4-> oneAPI fp64 on Arc A770 is emulated $\Rightarrow$ stays below $1\times$ --- a hardware fact, not a software gap
+  \end{itemize}
+\end{frame}
+
 \begin{frame}[fragile]{Trade-off: compile-once per algebraic pattern}
   \scriptsize Each new algebraic pattern triggers a fresh compile. Changing the expression --- even by one term --- counts as a new pattern.
   \medskip
@@ -489,20 +502,6 @@ optimize!(model)
   \item<3-> OpenCL / oneAPI backends held by a GPUCompiler pin (upstream SPIR-V issue)
   \end{itemize}
 \end{frame}
-
-% =============================================================
-\section{Numerical results}
-% =============================================================
-\begin{frame}{Benchmarks}{AD-callback speedup vs CPU-1T baseline, AC OPF (PGLIB-OPF), 4 backends}
-  \centering
-  \includegraphics[width=\textwidth]{exa_backend_scaling.pdf}
-  \begin{itemize}
-  \item<2-> Jacobian / Hessian on CUDA, AMDGPU reach \alert{$>100\times$} at $n_{\text{var}} \sim 10^6$
-  \item<3-> \texttt{obj} / \texttt{cons} sit closer to parity: small per-call work, GPU-launch dominated
-  \item<4-> oneAPI fp64 on Arc A770 is emulated $\Rightarrow$ stays below $1\times$ --- a hardware fact, not a software gap
-  \end{itemize}
-\end{frame}
-
 
 % =============================================================
 \section{Conclusion}
