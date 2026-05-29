@@ -353,7 +353,7 @@ optimize!(model)
   \begin{itemize}
   \item Intercept JuMP's expression at construction time and route it to the ExaModels backend --- patterns survive intact, no scalar enumeration in the bridge.
   \item<2-> Minimal model rewrite: \texttt{container = ParametrizedArray} on \texttt{@constraint}, \texttt{lazy\_sum} on \texttt{@objective}
-  \item<3-> \emph{Legat's work, not mine} --- a really cool proof-of-concept route. I'm thinking about something else next.
+  \item<3-> A really cool proof-of-concept route --- I'm thinking about something else next.
   \end{itemize}
   \refbr{
     \fullcite{legatGenOptJl2025}
