@@ -17,6 +17,9 @@ Prepare Sungho's two 2026 ExaModels talks:
 - JuMP-dev 2026 *date + length* — Sungho asked Noor 2026-05-29 11:02. Pending.
 - *Audience emphasis weighting* — I proposed API → SIMD design → GPU benchmarks → ecosystem; Sungho hasn't pushed back, so default until told otherwise.
 
+* Visual PDF review rule (Sungho 2026-05-29 11:26)
+*Always read the rendered PDF page by page after structural edits*, not just trust =latexmk= exit code. =Read= tool supports PDFs (up to 20 pages per request; use =pages: "N-M"= for ranges). Clean compile $\neq$ correct layout: overlay reveals, frame overflow, paragraph-break bugs inside =\begin{onlyenv}= can only be caught by looking at the actual rendering. *How to apply*: after any edit that changes frame structure, run =pdfinfo main.pdf | grep Pages= to get total page count, then =Read main.pdf= in 15-page chunks and scan each rendered slide. Specifically check for: text running off the bottom (overflowing the footer), prose colliding with alert headers (need explicit =\par= before =\medskip= inside =onlyenv=), code listings clipped, image aspect ratio issues. *Why*: missed the Path-1/Path-2 collision and the status-quo footer overflow until Sungho prompted me to view the PDF.
+
 * Length target (Sungho 2026-05-29 11:25)
 *15-minute talk + Q&A discussion afterwards.* Sungho wants real room for the discussion, so the deck must be tight: target ~12-13 PDF frames total (~1 min per content slide; budget 5-10 min for discussion). When tempted to add a slide, ask whether it fits within this budget --- almost certainly something else has to go.
 
