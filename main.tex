@@ -305,46 +305,31 @@ result = madnlp(em)
 % =============================================================
 \begin{frame}[fragile]{The ExaModels JuMP Interface}{Status Quo}
   \scriptsize
-  \begin{columns}[T]
-    \begin{column}{.49\textwidth}
-      \alert{\bfseries JuMP $\to$ ExaModels (via the MOI bridge)}
 \begin{lstlisting}
-using JuMP, ExaModels, CUDA, MadNLPGPU
+using JuMP, ExaModels, CUDA, MadNLP, MadNLPGPU
 
+# Build the JuMP model
 N = 100
 jm = Model()
-@variable(jm, x[i=1:N],
-    start = isodd(i) ? -1.2 : 1.0)
-@objective(jm, Min, sum(100*(x[i+1] - x[i]^2)^2
-                       + (1 - x[i])^2 for i = 1:N-1))
+@variable(jm, x[i=1:N], start = isodd(i) ? -1.2 : 1.0)
+@objective(jm, Min, sum(100*(x[i+1] - x[i]^2)^2 + (1 - x[i])^2 for i = 1:N-1))
 
+# Path 1 --- Direct conversion to an ExaModel
 em = ExaModel(jm; backend = CUDABackend())
 result = madnlp(em)
-\end{lstlisting}
-    \end{column}
-    \begin{column}{.49\textwidth}
-      \alert{\bfseries Native ExaModels}
-\begin{lstlisting}
-using ExaModels, CUDA, MadNLPGPU
 
-N = 100
-core = ExaCore(backend = CUDABackend())
-@add_var(core, x, N;
-    start = (isodd(i) ? -1.2 : 1.0 for i = 1:N))
-@add_obj(core, 100*(x[i+1] - x[i]^2)^2
-              + (1 - x[i])^2 for i = 1:N-1)
-em = ExaModel(core); madnlp(em)
+# Path 2 --- ExaModels as a JuMP optimizer
+set_optimizer(jm, () -> ExaModels.Optimizer(MadNLP.madnlp, CUDABackend()))
+optimize!(jm)
 \end{lstlisting}
-    \end{column}
-  \end{columns}
   \smallskip
-  \scriptsize
-  Bridge alternative: \texttt{set\_optimizer(jm, ExaModels.Optimizer(...))}. Bridge supports \texttt{@constraint} / \texttt{@objective} only (\alert{not legacy \texttt{@NLconstraint} / \texttt{@NLobjective}}).
-  \smallskip
+  \small
+  Bridge supports \texttt{@constraint} / \texttt{@objective} only (\alert{not legacy \texttt{@NLconstraint} / \texttt{@NLobjective}}).
+  \medskip
   \visible<2->{
-  \begin{block}{Model-build cost (Rosenbrock; this desktop)}
+  \begin{block}{Model-build cost (Rosenbrock at $N=10^5$; this desktop)}
     \centering
-    At $N=10^5$: JuMP route \alert{$\sim 1.74$\,s} vs Native ExaModels \alert{$\sim 0.44$\,ms} \;---\; \alert{$\sim 4000\times$ gap}, growing with $N$.
+    JuMP route \alert{$\sim 1.74$\,s} vs native ExaModels \alert{$\sim 0.44$\,ms} \;---\; \alert{$\sim 4000\times$ gap}, growing with $N$.
   \end{block}
   }
 \end{frame}
