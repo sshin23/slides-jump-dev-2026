@@ -7,7 +7,7 @@
 
 using ExaModels, NLPModelsIpopt
 
-core = ExaCore()
+core = ExaCore(concrete = Val(true))
 
 # Toy 2-bus, 2-arc, 1-gen network — minimal data to exercise the pattern.
 bus = [(i = 1, pd = 0.0, gs = 0.0), (i = 2, pd = 1.0, gs = 0.0)]

@@ -1,6 +1,6 @@
 using ExaModels, NLPModelsIpopt
 
-core = ExaCore(minimize = false)          # maximize final altitude
+core = ExaCore(minimize = false, concrete = Val(true))
 @add_var(core, h, 0:nh; start = 1.0, lvar = 1.0)
 @add_var(core, v, 0:nh; start = (i/nh*(1-i/nh) for i=0:nh))
 @add_var(core, m, 0:nh; start = ..., lvar = m_f, uvar = m_0)
