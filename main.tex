@@ -207,7 +207,7 @@
       \item Same philosophy as JuMP / AMPL / CasADi / Pyomo: a \alert{convenient indexed syntax} for the user
       \item Uses \alert{scalar-based indexing} (vs vectorization \`a la CasADi MX) --- like JuMP
       \item Builds an \texttt{NLPModels.AbstractNLPModel}: feeds Ipopt, KNITRO, MadNLP, Uno, \dots
-      \item<2-> \alert{\bfseries Killer feature}: GPU-native model + derivative evaluation; six KA.jl backends, maximal device performance
+      \item<2-> \alert{\bfseries Killer feature}: GPU-native model + derivative evaluation; same code, change \alert{one keyword} (\texttt{backend = CUDABackend()}); six KA.jl backends
       \end{itemize}
     \end{column}
     \begin{column}{.49\textwidth}
@@ -323,15 +323,6 @@
   }
 \end{frame}
 
-
-\begin{frame}[fragile]{Goddard rocket in ExaModels}
-  \lstinputlisting{code/07_goddard_snippet.jl}
-  \begin{itemize}
-  \item<2-> Three dynamics + four boundaries = \alert{5 patterns}, regardless of \texttt{nh}
-  \item<3-> Same code on GPU: change \alert{one line} ---
-        \texttt{core = ExaCore(minimize = false, backend = CUDABackend())}
-  \end{itemize}
-\end{frame}
 
 % =============================================================
 \section{Stay in JuMP: GenOpt.jl}
