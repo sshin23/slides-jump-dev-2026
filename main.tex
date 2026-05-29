@@ -249,7 +249,7 @@ result = madnlp(em)
         \node (cpu) at (0, 2.7) {\includegraphics[width=1.6cm]{cpu_chip_parisc.jpg}};
         \node[font=\bfseries, color=mitdarkgray] at (0, 3.55) {CPU};
         % GPU image
-        \node (gpu) at (0, 0) {\includegraphics[width=2.0cm]{gpu_msi_gt1030_cc0.jpg}};
+        \node (gpu) at (0, 0) {\includegraphics[width=2.0cm]{exa_a100_gpu.png}};
         \node[font=\bfseries, color=mitred] at (0, -0.95) {GPU};
         % arrows
         \draw[->, very thick, mitred] (-0.45, 2.05) -- (-0.45, 0.8);
@@ -281,7 +281,7 @@ result = madnlp(em)
         \node (cpu) at (0, 2.8) {\includegraphics[width=2.4cm]{cpu_chip_parisc.jpg}};
         \node[font=\bfseries, color=mitdarkgray] at (0, 3.95) {CPU};
         % GPU image (wider)
-        \node (gpu) at (0, 0) {\includegraphics[width=2.4cm]{gpu_msi_gt1030_cc0.jpg}};
+        \node (gpu) at (0, 0) {\includegraphics[width=2.4cm]{exa_a100_gpu.png}};
         \node[font=\bfseries, color=mitred] at (0, -1.2) {GPU};
         % five bidirectional arrows
         \foreach \i in {0,1,2,3,4} {
@@ -519,7 +519,7 @@ optimize!(model)
     \node at (current page.center) {\printbibliography[heading=none]};
   }
   \vfill
-  {\tiny\color{mitdarkgray} CPU die image: T.~Schanz (CC-BY-SA 4.0). GPU card: G.~Houston (CC0). Both via Wikimedia Commons.}
+  {\tiny\color{mitdarkgray} CPU die image: T.~Schanz (CC-BY-SA 4.0, Wikimedia Commons). NVIDIA A100 image: from S.~Shin's archive (vendor reference).}
 \end{frame}
 
 \end{document}
