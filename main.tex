@@ -333,35 +333,40 @@ em = ExaModel(core); madnlp(em)
 % =============================================================
 \section{SIMD abstraction}
 % =============================================================
-\begin{frame}{An alternative to vectorization}
-  \begin{itemize}
-  \item Two strategies preserve indexed-constraint structure at the modeling layer:
-  \end{itemize}
-  \begin{columns}[t]
-    \begin{column}{.48\textwidth}
-      \alert{\bfseries Vectorization}
-      \begin{itemize}
-      \item Express each indexed family as a single matrix-algebra operation
-      \item Canonical: CasADi MX, NumPy-style arrays
-      \item Heterogeneous indexed structure (e.g., ACOPF power balance) requires \alert{pre-built sparse incidence matrices}
-      \end{itemize}
+\begin{frame}[fragile]{An alternative to vectorization}{AC power balance at each bus}
+  \scriptsize
+  $\displaystyle p^d_i + g^{sh}_i\, V_i^2 + \sum_{a \in \mathcal{A}(i)} p_a \;-\; \sum_{g \in \mathcal{G}(i)} p^g_g \;=\; 0
+    \qquad \forall i \in \text{bus}$
+  \medskip
+  \begin{columns}[T]
+    \begin{column}{.49\textwidth}
+      \alert{\bfseries Vectorization} (e.g.\ JuMP / CasADi)
+\begin{lstlisting}
+# pre-built sparse incidence:
+#   E_arc[a, i] = 1 if arc a at bus i
+#   E_gen[g, i] = 1 if gen g at bus i
+@constraint(jm,
+    pd + gs .* vm.^2 + E_arc' * p
+    .== E_gen' * pg)
+\end{lstlisting}
     \end{column}
-    \begin{column}{.48\textwidth}
-      \visible<2->{
-      \alert{\bfseries Templatizing}
-      \begin{itemize}
-      \item Parameterize a single expression over a \alert{data iterator}; evaluate across instances
-      \item Canonical: Gravity, ExaModels
-      \item Heterogeneous structure handled \alert{directly by the iterator}
-      \end{itemize}
-      }
+    \begin{column}{.49\textwidth}
+      \alert{\bfseries Templatizing} (ExaModels)
+\begin{lstlisting}
+@add_con(core, cp,
+    b.pd + b.gs*vm[b.i]^2 for b in bus)
+@add_con!(core, cp,
+    a.bus =>  p[a.i]  for a in arc)
+@add_con!(core, cp,
+    g.bus => -pg[g.i] for g in gen)
+\end{lstlisting}
     \end{column}
   \end{columns}
   \medskip
-  \visible<3->{
-    \begin{block}{ExaModels' SIMD abstraction}
-      Each objective term / constraint = a \alert{(pattern, data iterator)} pair. One compiled derivative kernel per pattern, executed across all data points in SIMD fashion.
-    \end{block}
+  \visible<2->{
+  \begin{block}{Not a "better-vs-worse" choice}
+    \small Vectorization shifts the work to pre-built sparse incidence matrices; templatizing exposes per-index sums directly. \alert{ExaModels follows the templatizing route: scalar-based indexing throughout.}
+  \end{block}
   }
 \end{frame}
 
