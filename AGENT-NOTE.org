@@ -67,6 +67,9 @@ Prepare Sungho's two 2026 ExaModels talks:
 * Acknowledgement rule (Sungho 2026-05-29 11:21)
 When acknowledging a person on a slide (contributor, collaborator, co-author): include their *GitHub handle* AND *profile photo* alongside the name. Avatars live in =figs/<github_login>.{jpeg,png}=, downloaded via =gh api users/<login> --jq '.avatar_url'=. If a person has no GitHub presence, show name + affiliation alone; never invent a handle. *Why*: makes attribution concrete and recognizable to a JuMP-dev audience; people in the room know each other by GitHub handle as often as by full name.
 
+* Who-Are-We structure (Sungho 2026-05-29 11:22)
+The Who-Are-We slide doubles as the contributor list --- *not* just the paper co-authors. Order: *Sungho first*, then remaining contributors by GitHub contribution-count descending. Header URL: =https://github.com/exanauts/ExaModels.jl= (NOT madsuite.org). The standalone "Thank you to contributors" slide near the end was removed (Sungho 2026-05-29) to avoid duplicating this grid. *Why*: the team intro IS the contributor acknowledgement --- collapses the two ceremonial slides into one substantive opener.
+
 * Style anchors (from LIDS deck + Sungho's voice profile)
 - Dense bulleted itemize with =<n->= overlay reveals to time the narrative.
 - =\alert{}= sparingly --- the few words that carry the meaning.

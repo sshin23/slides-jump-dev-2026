@@ -159,23 +159,32 @@
 \setbeamertemplate{footline}[content]
 \begin{frame}{Who are we?}
   \begin{center}
-    \url{https://madsuite.org/}\\[.15in]
-    \begin{tabular}{cccc}
-      \includegraphics[width=.8in]{pacaud.jpeg} &
-      \includegraphics[width=.8in]{montoison.jpeg} &
-      \includegraphics[width=.8in]{shin.jpeg} &
-      \includegraphics[width=.8in]{anitescu.jpeg} \\
-      Fran\c{c}ois Pacaud & Alexis Montoison & Sungho Shin & Mihai Anitescu \\
-      {\scriptsize\color{mitdarkgray}\texttt{@frapac}} &
-      {\scriptsize\color{mitdarkgray}\texttt{@amontoison}} &
-      {\scriptsize\color{mitdarkgray}\texttt{@sshin23}} &
-      {\scriptsize\color{mitdarkgray}---} \\
-      {\scriptsize MINES Paris-PSL} & {\scriptsize AMD} & {\scriptsize MIT} & {\scriptsize Argonne}
+    \url{https://github.com/exanauts/ExaModels.jl}\\[.15in]
+    \scriptsize
+    \begin{tabular}{ccccc}
+      \includegraphics[width=.6in]{shin.jpeg} &
+      \includegraphics[width=.6in]{michel2323.jpeg} &
+      \includegraphics[width=.6in]{amontoison.jpeg} &
+      \includegraphics[width=.6in]{blegat.png} &
+      \includegraphics[width=.6in]{klamike.png} \\
+      Sungho Shin & Michel Schanen & Alexis Montoison & Beno\^it Legat & Michael Klamkin \\
+      {\color{mitdarkgray}\texttt{@sshin23}} &
+      {\color{mitdarkgray}\texttt{@michel2323}} &
+      {\color{mitdarkgray}\texttt{@amontoison}} &
+      {\color{mitdarkgray}\texttt{@blegat}} &
+      {\color{mitdarkgray}\texttt{@klamike}} \\[1.5ex]
+      \includegraphics[width=.6in]{frapac.jpeg} &
+      \includegraphics[width=.6in]{andrewrosemberg.jpeg} &
+      \includegraphics[width=.6in]{FHoltorf.png} &
+      \includegraphics[width=.6in]{jbcaillau.jpeg} &
+      \includegraphics[width=.6in]{hfytr.png} \\
+      Fran\c{c}ois Pacaud & Andrew Rosemberg & Flemming Holtorf & Jean-Baptiste Caillau & Archim J \\
+      {\color{mitdarkgray}\texttt{@frapac}} &
+      {\color{mitdarkgray}\texttt{@andrewrosemberg}} &
+      {\color{mitdarkgray}\texttt{@FHoltorf}} &
+      {\color{mitdarkgray}\texttt{@jbcaillau}} &
+      {\color{mitdarkgray}\texttt{@hfytr}}
     \end{tabular}
-  \end{center}
-  \medskip
-  \begin{center}
-    \small\itshape and friends: Michel Schanen, Beno\^it Legat, Michael Klamkin, and the broader \texttt{exanauts} community.
   \end{center}
 \end{frame}
 
@@ -525,20 +534,9 @@ optimize!(model)
 \section{Conclusion}
 % =============================================================
 \begin{frame}{Summary}
-  \begin{columns}
-    \begin{column}{.5\textwidth}
-      \begin{center}
-        Project page:\\
-        \url{https://madsuite.org/}
-      \end{center}
-    \end{column}
-    \begin{column}{.5\textwidth}
-      \begin{center}
-        Package:\\
-        \url{https://github.com/exanauts/ExaModels.jl}
-      \end{center}
-    \end{column}
-  \end{columns}
+  \begin{center}
+    \url{https://github.com/exanauts/ExaModels.jl}
+  \end{center}
   \vspace{1em}
   \begin{itemize}
   \item ExaModels offers a \alert{SIMD abstraction} for NLPs---an alternative to vectorization that preserves indexed structure through (pattern, data iterator) pairs
@@ -555,43 +553,6 @@ optimize!(model)
   \refbr{
     \fullcite{pacaudCondensedspaceMethodsNonlinear2024}
   }
-\end{frame}
-
-\begin{frame}{Thank you to the ExaModels.jl contributors}
-  \begin{center}
-    \url{https://github.com/exanauts/ExaModels.jl}
-  \end{center}
-  \vspace{.5em}
-  \begin{center}
-    \small
-    \begin{tabular}{ccc}
-      \includegraphics[width=.65in]{michel2323.jpeg} &
-      \includegraphics[width=.65in]{amontoison.jpeg} &
-      \includegraphics[width=.65in]{blegat.png} \\
-      Michel Schanen & Alexis Montoison & Beno\^it Legat \\
-      {\scriptsize\color{mitdarkgray}\texttt{@michel2323}} &
-      {\scriptsize\color{mitdarkgray}\texttt{@amontoison}} &
-      {\scriptsize\color{mitdarkgray}\texttt{@blegat}} \\[1.0ex]
-      \includegraphics[width=.65in]{klamike.png} &
-      \includegraphics[width=.65in]{frapac.jpeg} &
-      \includegraphics[width=.65in]{andrewrosemberg.jpeg} \\
-      Michael Klamkin & Fran\c{c}ois Pacaud & Andrew Rosemberg \\
-      {\scriptsize\color{mitdarkgray}\texttt{@klamike}} &
-      {\scriptsize\color{mitdarkgray}\texttt{@frapac}} &
-      {\scriptsize\color{mitdarkgray}\texttt{@andrewrosemberg}} \\[1.0ex]
-      \includegraphics[width=.65in]{FHoltorf.png} &
-      \includegraphics[width=.65in]{jbcaillau.jpeg} &
-      \includegraphics[width=.65in]{hfytr.png} \\
-      Flemming Holtorf & Jean-Baptiste Caillau & Archim J \\
-      {\scriptsize\color{mitdarkgray}\texttt{@FHoltorf}} &
-      {\scriptsize\color{mitdarkgray}\texttt{@jbcaillau}} &
-      {\scriptsize\color{mitdarkgray}\texttt{@hfytr}}
-    \end{tabular}
-  \end{center}
-  \medskip
-  \begin{center}
-    \scriptsize\itshape and the broader \texttt{exanauts} community.
-  \end{center}
 \end{frame}
 
 \AtNextBibliography{\tiny}
