@@ -1,0 +1,95 @@
+\begin{tikzpicture}[
+  scale=0.82, transform shape,
+  % Uniform rounded-rectangle style for all nodes, color-coded by role
+  nd/.style={rectangle, rounded corners=3pt, draw=gray!60, thick, fill=white,
+    minimum height=7mm, minimum width=10mm, inner sep=2pt, font=\footnotesize\ttfamily},
+  ndvar/.style={nd, draw=j1!80, fill=j1!10},
+  nddata/.style={nd, draw=j3!80, fill=j3!10},
+  ndconst/.style={nd, draw=j4!70, fill=j4!8},
+  ndsrc/.style={nd, draw=j2!80, fill=j2!10},
+  % Edge style
+  edge from parent/.style={draw, gray!60, semithick},
+  % Level spacing
+  level 1/.style={sibling distance=58mm, level distance=13mm},
+  level 2/.style={sibling distance=30mm, level distance=13mm},
+  level 3/.style={sibling distance=22mm, level distance=13mm},
+  level 4/.style={sibling distance=17mm, level distance=13mm},
+  level 5/.style={sibling distance=14mm, level distance=12mm},
+  level 6/.style={sibling distance=14mm, level distance=11mm},
+  % Type annotation style
+  typelabel/.style={font=\tiny\sffamily, text=gray!60, inner sep=1pt},
+]
+
+% Main expression tree
+\node[nd] (root) {$+$}
+  child { node[nd] (times) {$\times$}
+    child { node[ndconst] (c100) {100} }
+    child { node[nd] (sq1) {abs2}
+      child { node[nd] (sub1) {$-$}
+        child { node[nd] (sq2) {abs2}
+          child { node[ndvar] (v1) {Var}
+            child { node[nd] (plus1) {$+$}
+              child { node[nddata] (di1) {$[\,]$}
+                child { node[ndsrc] (ds1) {DataSource} }
+              }
+              child { node[ndconst] (off1) {$o_1$} }
+            }
+          }
+        }
+        child { node[ndvar] (v2) {Var}
+          child { node[nd] (plus2) {$+$}
+            child { node[nddata] (di2) {$[\,]$}
+              child { node[ndsrc] (ds2) {DataSource} }
+            }
+            child { node[ndconst] (off2) {$o_2$} }
+          }
+        }
+      }
+    }
+  }
+  child { node[nd] (sq3) {abs2}
+    child { node[nd] (sub2) {$-$}
+      child { node[ndvar] (v3) {Var}
+        child { node[nd] (plus3) {$+$}
+          child { node[nddata] (di3) {$[\,]$}
+            child { node[ndsrc] (ds3) {DataSource} }
+          }
+          child { node[ndconst] (off3) {$o_1$} }
+        }
+      }
+      child { node[ndconst] (c1) {1} }
+    }
+  };
+
+% Type annotations
+\node[typelabel, above right=-1pt and 3pt of root] {Node2\{$+$\}};
+\node[typelabel, above right=-1pt and 3pt of sq1] {Node1\{abs2\}};
+\node[typelabel, above left=-1pt and 3pt of v1] {Var\{Node2\{$+$,...\}\}};
+\node[typelabel, left=3pt of c100, anchor=east] {Constant\{100\}};
+\node[typelabel, below=1pt of di1, anchor=north west] {\color{j3!80}DataIndexed};
+
+% Dashed box around a Var subtree to highlight index computation
+\begin{scope}[on background layer]
+  \node[draw=j1!40, dashed, rounded corners=5pt, fill=j1!3,
+    inner sep=4pt, fit=(v1)(plus1)(di1)(off1)(ds1)] {};
+\end{scope}
+
+% Semantic annotations: what each subtree evaluates to
+\node[font=\tiny\itshape, text=j1!80, anchor=east] at ([xshift=-2pt]v1.west) {$x[i{+}o_1]\leftarrow$};
+
+% Legend — clean horizontal bar
+\node[anchor=north, font=\footnotesize, inner sep=0pt] at (0,-9.5) {
+  \begin{tikzpicture}[scale=0.82, transform shape]
+    \node[nd, minimum size=5mm] at (0,0) {};
+    \node[font=\scriptsize, anchor=west] at (0.4,0) {Node1/Node2};
+    \node[ndvar, minimum size=5mm] at (2.8,0) {};
+    \node[font=\scriptsize, anchor=west] at (3.2,0) {Var};
+    \node[nddata, minimum size=5mm] at (4.5,0) {};
+    \node[font=\scriptsize, anchor=west] at (4.9,0) {DataIndexed};
+    \node[ndconst, minimum size=5mm] at (7.3,0) {};
+    \node[font=\scriptsize, anchor=west] at (7.7,0) {Constant};
+    \node[ndsrc, minimum size=5mm] at (9.5,0) {};
+    \node[font=\scriptsize, anchor=west] at (9.9,0) {DataSource};
+  \end{tikzpicture}
+};
+\end{tikzpicture}

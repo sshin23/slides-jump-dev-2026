@@ -420,13 +420,13 @@ optimize!(model)
 % =============================================================
 \section{Numerical results}
 % =============================================================
-\begin{frame}{Benchmarks}{Luk\v{s}an--Vlc\v{e}k, COPS, PGLIB-OPF}
+\begin{frame}{Benchmarks}{AD-callback speedup vs CPU-1T baseline, AC OPF (PGLIB-OPF), 4 backends}
+  \centering
+  \includegraphics[width=\textwidth]{exa_backend_scaling.pdf}
   \begin{itemize}
-  \item ExaModels-native suites: \texttt{LuksanVlcekBenchmark.jl}, \texttt{COPSBenchmark.jl}, \texttt{ExaModelsPower.jl}
-  \item<2-> \alert{CPU}: ExaModels vs JuMP vs AMPL --- function + derivative evaluation timing (AD layer only)
-  \item<3-> \alert{GPU}: same model code on CUDA, ROCm, oneAPI, Metal, OpenCL; CPU-8T baseline
-  \item<4-> Up to \alert{two orders of magnitude} acceleration over CPU baseline on large instances
-  \item<5-> \alert{Plot / table placeholders} --- to be lifted from paper \S 9.2--9.3
+  \item<2-> Jacobian / Hessian on CUDA, AMDGPU reach \alert{$>100\times$} at $n_{\text{var}} \sim 10^6$
+  \item<3-> \texttt{obj} / \texttt{cons} sit closer to parity: small per-call work, GPU-launch dominated
+  \item<4-> oneAPI fp64 on Arc A770 is emulated $\Rightarrow$ stays below $1\times$ --- a hardware fact, not a software gap
   \end{itemize}
 \end{frame}
 
