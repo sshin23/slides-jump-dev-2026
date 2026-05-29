@@ -106,8 +106,8 @@
 
 \graphicspath{{figs/}}
 
-\title[ExaModels.jl on GPUs]{ExaModels.jl: an Algebraic Modeling System for Nonlinear Programming on GPUs}
-\subtitle{Pattern-aware modeling and GPU-native automatic differentiation in Julia}
+\title[Can ExaModels Power JuMP on GPUs?]{Can ExaModels Power JuMP on GPUs?}
+\subtitle{Pattern-aware modeling and GPU-native automatic differentiation}
 \author{
   Sungho Shin\\
   \url{shin.mit.edu}
@@ -116,7 +116,7 @@
   Massachusetts Institute of Technology
 }
 
-\date{JuMP-dev 2026}
+\date{JuMP-dev 2026 \quad\textbar\quad Edinburgh \quad\textbar\quad 16:15 BST}
 
 \begin{document}
 
@@ -151,7 +151,61 @@
 \end{frame}
 
 % =============================================================
-\section{Motivation}
+\section{The question}
+% =============================================================
+\begin{frame}{You have a JuMP model. You want it on a GPU.}
+  \begin{itemize}
+  \item JuMP gives you a clean modeling layer, a mature solver ecosystem, and CPU performance that scales to large problems
+  \item<2-> GPUs sit one step further: \alert{factorization-based} optimization is starting to land on GPUs, with $\geq$10$\times$ speedups on the right problems \citep{pacaudCondensedspaceMethodsNonlinear2024}
+  \item<3-> But solver speedup is wasted if \alert{the model layer} can't feed it---callbacks must run on the device
+  \item<4-> Today's question:
+  \end{itemize}
+  \medskip
+  \visible<5->{
+    \begin{center}
+      \it Can ExaModels power JuMP on GPUs?
+    \end{center}
+  }
+  \refbr{
+    \fullcite{pacaudCondensedspaceMethodsNonlinear2024}
+  }
+\end{frame}
+
+% =============================================================
+\section{The translation layer}
+% =============================================================
+\begin{frame}{ExaModelsMOI.jl: the JuMP $\Rightarrow$ ExaModels bridge}
+  \begin{itemize}
+  \item \texttt{ExaModelsMOI.jl} consumes an \alert{MOI model} and produces an ExaModel
+  \item<2-> Strategy: \alert{recover patterns} from the scalar collection by \alert{bucketing constraints with matching expression heads} into templatized sums
+  \item<3-> User-side workflow stays in JuMP; ExaModels is selected as the AD backend
+  \item<4-> When the buckets are big enough, derivatives evaluate on GPU at ExaModels-native speed
+  \end{itemize}
+  \medskip
+  \visible<5->{
+    \begin{block}{First answer}
+      Yes---for indexed constraints that arrive at MOI as homogeneous scalar batches.
+    \end{block}
+  }
+\end{frame}
+
+\begin{frame}{Where the bridge breaks}
+  \begin{itemize}
+  \item JuMP lowers \texttt{@constraint(model, [i=1:N], ...)} to a flat scalar collection \alert{before} the model is submitted
+  \item<2-> Pattern information that was visible to the user is \alert{no longer visible} to MOI
+  \item<3-> \texttt{ExaModelsMOI.jl} runs \emph{after} this collapse---it can recover patterns only when scalar constraints happen to share an expression head
+  \item<4-> Heterogeneous indexed structure (e.g., variable-size sums per index, as in ACOPF power balance) does \alert{not} round-trip
+  \end{itemize}
+  \medskip
+  \visible<5->{
+    \begin{center}
+      \it To get the full speedup we need to keep the pattern alive through model construction.
+    \end{center}
+  }
+\end{frame}
+
+% =============================================================
+\section{Why patterns matter}
 % =============================================================
 \begin{frame}{Large-scale NLPs have repetitive structure}
   \begin{itemize}
@@ -159,23 +213,10 @@
   \item<2-> Yet their formulations fit on a few pages---the same \alert{algebraic pattern} repeats across spatial nodes, time steps, scenarios, data samples
   \item<3-> ACOPF on a network with thousands of buses: only \alert{15 distinct algebraic patterns} \citep{shinAcceleratingOptimalPower2024}
   \item<4-> Problem size is driven by the number of \alert{data points}, not the number of patterns
+  \item<5-> Most AMSs (AMPL, GAMS, JuMP) flatten this at construction time. Cost: redundant work, no SIMD parallelism over patterns, \alert{no path to native GPU evaluation}
   \end{itemize}
   \refbr{
     \fullcite{shinAcceleratingOptimalPower2024}
-  }
-\end{frame}
-
-\begin{frame}{The AMS landscape flattens this structure}
-  \begin{itemize}
-  \item Algebraic modeling systems (AMS) sit between the formulation and the solver: AMPL, GAMS, JuMP, CasADi, Pyomo, ...
-  \item<2-> Most build a \alert{flat, per-scalar expression graph} at construction time; indexed constraints lower to a flat scalar collection \emph{before} AD
-  \item<3-> Pattern information that was visible to the user becomes invisible to the AD machinery
-  \item<4-> Consequences: redundant work per data point, no SIMD parallelism over patterns, \alert{no path to GPU} for the modeling layer
-  \end{itemize}
-  \visible<5->{
-    \begin{center}
-      \it What modeling abstraction preserves the pattern structure, and how can we harness it for efficient, GPU-compatible derivative evaluation?
-    \end{center}
   }
 \end{frame}
 
@@ -242,9 +283,9 @@
 \end{frame}
 
 % =============================================================
-\section{User-facing API}
+\section{Two routes for JuMP users}
 % =============================================================
-\begin{frame}{Building a model in ExaModels}
+\begin{frame}{Route A: native ExaModels API}
   \begin{itemize}
   \item Six macros cover the modeling surface:
     \begin{itemize}
@@ -255,6 +296,7 @@
     \end{itemize}
   \item<2-> User registers custom univariate / bivariate functions with first \& second derivatives via \texttt{@register\_univariate}, \texttt{@register\_bivariate}
   \item<3-> Output is a standard \texttt{NLPModels.AbstractNLPModel}---consumable by Ipopt, KNITRO, MadNLP, Uno, Percival, DCISolver, FletcherPenaltySolver
+  \item<4-> Patterns stay intact end-to-end. \alert{Full GPU acceleration}
   \end{itemize}
 \end{frame}
 
@@ -269,6 +311,24 @@
     \item Same code runs on CPU and any GPU backend by changing one keyword
     \end{itemize}
   \end{itemize}
+\end{frame}
+
+\begin{frame}{Route B: GenOpt.jl \citep{legatGenOptJl2025} --- stay in JuMP, keep patterns}
+  \begin{itemize}
+  \item \texttt{GenOpt.jl} is an actively developed \alert{JuMP extension} adding constraint and term \emph{generators}
+  \item<2-> Generators express indexed families as \alert{first-class objects}, not as scalar collections
+  \item<3-> Patterns are preserved at \alert{JuMP-side construction}---ExaModels receives them \alert{intact}
+  \item<4-> No model rewrite for existing JuMP users: swap \texttt{@constraint(model, [i=1:N], ...)} for the generator form
+  \end{itemize}
+  \medskip
+  \visible<5->{
+    \begin{block}{Recommendation for JuMP users today}
+      Route A when starting fresh; Route B (GenOpt.jl + ExaModelsMOI.jl) to retrofit existing JuMP code without leaving the JuMP ecosystem.
+    \end{block}
+  }
+  \refbr{
+    \fullcite{legatGenOptJl2025}
+  }
 \end{frame}
 
 % =============================================================
@@ -365,7 +425,7 @@
 % =============================================================
 \section{Conclusion}
 % =============================================================
-\begin{frame}{Wrap-up}
+\begin{frame}{Can ExaModels power JuMP on GPUs?}
   \begin{columns}
     \begin{column}{.5\textwidth}
       \begin{center}
@@ -382,10 +442,10 @@
   \end{columns}
   \vspace{1em}
   \begin{itemize}
-  \item \alert{Pattern--data separation} is the right modeling abstraction for large-scale, structured NLPs
-  \item<2-> A type-stable parameterized expression tree + coloring-free sparse AD makes GPU-native derivative evaluation practical
+  \item \alert{Yes}---via the translation layer for homogeneous batches, and via \texttt{GenOpt.jl} for the full pattern-preserving path
+  \item<2-> The lever is \alert{pattern--data separation}: a type-stable parameterized expression tree + coloring-free sparse AD makes GPU-native derivative evaluation practical
   \item<3-> One model, five backends, no code change
-  \item<4-> ExaModels.jl is already the modeling layer for MadNLP's GPU-native interior-point methods \citep{pacaudCondensedspaceMethodsNonlinear2024}
+  \item<4-> Already the modeling layer for MadNLP's GPU-native interior-point methods \citep{pacaudCondensedspaceMethodsNonlinear2024}
   \end{itemize}
   \refbr{
     \fullcite{pacaudCondensedspaceMethodsNonlinear2024}

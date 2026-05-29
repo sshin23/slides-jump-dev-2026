@@ -17,17 +17,24 @@ Prepare Sungho's two 2026 ExaModels talks:
 - JuMP-dev 2026 *date + length* — Sungho asked Noor 2026-05-29 11:02. Pending.
 - *Audience emphasis weighting* — I proposed API → SIMD design → GPU benchmarks → ecosystem; Sungho hasn't pushed back, so default until told otherwise.
 
-* Current scaffold (commit pending)
-=main.tex= compiles cleanly with =latexmk -pdf main.tex=. 19 frames across 10 sections:
+* Current scaffold (commit a7fa435 + restructure pending)
+*Confirmed title* (Sungho 2026-05-29 via Noor): "Can ExaModels Power JuMP on GPUs?". Venue line on title page: "JuMP-dev 2026 | Edinburgh | 16:15 BST". Day pending (May 31 vs June 1 — Sungho to confirm).
+
+*Confirmed structural reframe* (Sungho 2026-05-29 11:03): "I can start probably with the ExaModels translation layer". Reordered to open from the JuMP-user perspective, then motivate pattern structure, then show the two pattern-preserving routes (native ExaModels API, GenOpt.jl).
+
+=main.tex= compiles cleanly with =latexmk -pdf main.tex=. 22 frames across 12 sections:
 - Title + Who-are-we?
-- Motivation (2): pattern structure, the AMS landscape gap
-- SIMD abstraction (3): pattern-data separation, Goddard rocket worked example, AMS comparison table
-- User-facing API (2): macros overview, Goddard rocket in ExaModels (CODE LISTING TODO)
-- Under the hood (2): parameterized expression tree, coloring-free sparse AD
-- GPU execution (1): KA.jl + 5 backends + implementation choices
-- Beyond JIT (2): AOT compilation + numeric precision, extensions
-- Numerical results (2): CPU vs JuMP/AMPL, GPU 5-backend scaling — *tables/plots TODO*
-- Conclusion (1): madsuite.org + ExaModels.jl + summary
+- *§ The question* (1): "you have a JuMP model, you want GPU"
+- *§ The translation layer* (2): ExaModelsMOI.jl bridge + where it breaks (pattern collapse before MOI)
+- § Why patterns matter (1): NLPs are pattern-data; AMSs flatten this
+- § SIMD abstraction (2): pattern-data separation + Goddard rocket worked example
+- § AMS landscape table (still under SIMD section): where ExaModels sits among AMPL/JuMP/CasADi/Gravity
+- *§ Two routes for JuMP users* (3): native API, Goddard in code (TODO), GenOpt.jl
+- § Under the hood (2): parameterized expression tree + coloring-free sparse AD
+- § GPU execution (1): KA.jl + 5 backends + impl choices (COO, obj reduce, grad compress)
+- § Beyond JIT (2): AOT + numeric precision; parametric / two-stage / batch
+- § Numerical results (2): CPU vs JuMP/AMPL; 5-backend GPU scaling — *tables/plots TODO*
+- § Wrap-up (1): answers the title question explicitly
 - References + backup title
 
 * TODOs (after Sungho approves outline)
