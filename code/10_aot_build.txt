@@ -1,2 +1,2 @@
-$ juliac --trim=safe -o solve my_solve.jl
-$ ./solve   # no Julia runtime needed
+$ juliac --trim=safe -o rosenbrock MySolve.jl
+$ ./rosenbrock   # standalone; no Julia runtime
