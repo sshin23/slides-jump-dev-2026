@@ -296,6 +296,33 @@
   \lstinputlisting{code/05_interface_snippet.jl}
 \end{frame}
 
+% =============================================================
+\section{Stay in JuMP: GenOpt.jl}
+% =============================================================
+\begin{frame}[fragile]{GenOpt.jl \citep{legatGenOptJl2025} --- preserve patterns at JuMP-side construction}
+  \texttt{GenOpt.jl} (Benoît Legat) packs ``groups of similar constraints / sums of similar terms'' into \alert{lightweight generators} that ExaModels can recognize.
+\begin{lstlisting}
+using GenOpt, JuMP, CUDA, MadNLP
+
+@constraint(model, [i in 1:n], x[1,i] == x0[i],
+    container = ParametrizedArray)                            # grouped constraint
+
+@objective(model, Min,
+    lazy_sum(0.5 * R[j] * u[i,j]^2 for i in 1:N, j in 1:p))   # grouped sum
+
+set_optimizer(model, () -> GenOpt.ExaOptimizer(madnlp, CUDABackend()))
+optimize!(model)
+\end{lstlisting}
+  \begin{itemize}
+  \item<2-> Patterns are preserved at \alert{JuMP-side construction}---ExaModels receives them \alert{intact} (no scalar enumeration)
+  \item<3-> Minimal model rewrite: add the \texttt{container} keyword / wrap sums in \texttt{lazy\_sum}
+  \item<4-> \emph{Legat's work, not mine} --- but a really cool proof-of-concept route. I'm thinking about something else next.
+  \end{itemize}
+  \refbr{
+    \fullcite{legatGenOptJl2025}
+  }
+\end{frame}
+
 \begin{frame}[fragile]{Model-build cost: JuMP route vs native ExaModels (Rosenbrock at $N=10^5$)}
   \scriptsize
   \begin{columns}[T]
@@ -407,32 +434,6 @@
   \end{itemize}
 \end{frame}
 
-% =============================================================
-\section{Stay in JuMP: GenOpt.jl}
-% =============================================================
-\begin{frame}[fragile]{GenOpt.jl \citep{legatGenOptJl2025} --- preserve patterns at JuMP-side construction}
-  \texttt{GenOpt.jl} (Benoît Legat) packs ``groups of similar constraints / sums of similar terms'' into \alert{lightweight generators} that ExaModels can recognize.
-\begin{lstlisting}
-using GenOpt, JuMP, CUDA, MadNLP
-
-@constraint(model, [i in 1:n], x[1,i] == x0[i],
-    container = ParametrizedArray)                            # grouped constraint
-
-@objective(model, Min,
-    lazy_sum(0.5 * R[j] * u[i,j]^2 for i in 1:N, j in 1:p))   # grouped sum
-
-set_optimizer(model, () -> GenOpt.ExaOptimizer(madnlp, CUDABackend()))
-optimize!(model)
-\end{lstlisting}
-  \begin{itemize}
-  \item<2-> Patterns are preserved at \alert{JuMP-side construction}---ExaModels receives them \alert{intact} (no scalar enumeration)
-  \item<3-> Minimal model rewrite: add the \texttt{container} keyword / wrap sums in \texttt{lazy\_sum}
-  \item<4-> Originally presented at JuMP-dev 2025 --- a \alert{promising proof-of-concept route}
-  \end{itemize}
-  \refbr{
-    \fullcite{legatGenOptJl2025}
-  }
-\end{frame}
 
 % =============================================================
 \section{Conclusion}
