@@ -194,12 +194,11 @@
 \begin{frame}[fragile]{What is ExaModels?}
   \begin{columns}[T]
     \begin{column}{.49\textwidth}
-      \begin{itemize}\itemsep3pt
-      \item \alert{Algebraic modeling system} embedded in Julia
-      \item Same philosophy as JuMP / AMPL / CasADi / Pyomo: a \alert{convenient indexed syntax} for the user
-      \item Uses \alert{scalar-based indexing} (vs vectorization \`a la CasADi MX) --- like JuMP
-      \item Builds an \texttt{NLPModels.AbstractNLPModel}: feeds Ipopt, KNITRO, MadNLP, Uno, \dots
-      \item<2-> \alert{\bfseries Killer feature}: GPU-native model + derivative evaluation; same code, change \alert{one keyword} (\texttt{backend = CUDABackend()}); six KA.jl backends
+      \begin{itemize}\itemsep4pt
+      \item \alert{Algebraic modeling system} embedded in Julia.
+      \item Builds on \texttt{NLPModels.jl} --- compatible with the broader NLPModels.jl ecosystem: \texttt{Ipopt}, \texttt{MadNLP}, \texttt{KNITRO}, \texttt{Uno}, \dots
+      \item<2-> \alert{\bfseries Killer feature}: \alert{GPU-compatible modeling} --- more on this later.
+      \item<3-> \alert{\bfseries Design philosophy}: not optimized for ease-of-use, optimized for \alert{runtime performance}. Aim: the \alert{fastest modeling system} for building and running optimization solves.
       \end{itemize}
     \end{column}
     \begin{column}{.49\textwidth}
