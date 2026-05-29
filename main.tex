@@ -198,26 +198,31 @@
 % =============================================================
 \section{The translation layer}
 % =============================================================
-\begin{frame}[fragile]{The JuMP $\Rightarrow$ ExaModels bridge}
-  \begin{itemize}
-  \item Load \texttt{ExaModels} and \texttt{JuMP} together---a Julia \alert{package extension} (\texttt{ExaModelsJuMP}, \texttt{ExaModelsMOI}) activates automatically
-  \item<2-> Conversion is one constructor call:
-  \end{itemize}
-  \begin{onlyenv}<2->
+\begin{frame}[fragile]{Two paths from JuMP to ExaModels}
+  Load \texttt{ExaModels} + \texttt{JuMP} together---the \texttt{ExaModelsJuMP} / \texttt{ExaModelsMOI} package extensions activate automatically.
+  \medskip
+  \begin{onlyenv}<1->
+  \alert{\bfseries Path 1 --- Direct conversion to an \texttt{ExaModel}}
 \begin{lstlisting}
-using ExaModels, JuMP, CUDA
+using ExaModels, JuMP, CUDA, MadNLPGPU
 
-jm = Model()
-@variable(jm, x[i=1:N], start = mod(i,2) == 1 ? -1.2 : 1.0)
-@constraint(jm, s[i=1:(N-2)], 3x[i+1]^3 + 2x[i+2] - 5 + ... == 0.0)
-@objective(jm, Min, sum(100(x[i-1]^2 - x[i])^2 + (x[i-1] - 1)^2 for i = 2:N))
-
-em = ExaModel(jm; backend = CUDABackend())  # JuMP model -> GPU-ready ExaModel
+em = ExaModel(jm; backend = CUDABackend())   # JuMP -> GPU-ready ExaModel
+result = madnlp(em)                          # solve via NLPModels API
 \end{lstlisting}
   \end{onlyenv}
+  \medskip
+  \begin{onlyenv}<2->
+  \alert{\bfseries Path 2 --- ExaModels as a JuMP optimizer}
+\begin{lstlisting}
+using ExaModels, JuMP, CUDA, MadNLP, MadNLPGPU
+
+set_optimizer(jm, () -> ExaModels.Optimizer(MadNLP.madnlp, CUDABackend()))
+optimize!(jm)                                # stay in JuMP, solve on GPU
+\end{lstlisting}
+  \end{onlyenv}
+  \medskip
   \begin{itemize}
-  \item<3-> Or use it as a JuMP optimizer: \texttt{set\_optimizer(jm, () -> ExaModels.Optimizer(MadNLP.madnlp, CUDABackend()))}
-  \item<4-> Strategy under the hood: \alert{recover patterns} from the MOI scalar collection by \alert{bucketing matching expression heads} into templatized sums
+  \item<3-> Both routes go through the same MOI bridge: \alert{recover patterns} from the scalar collection by \alert{bucketing matching expression heads} into templatized sums
   \end{itemize}
 \end{frame}
 
