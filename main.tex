@@ -285,46 +285,49 @@
 \section{The ExaModels JuMP Interface}
 % =============================================================
 \begin{frame}[fragile]{The ExaModels JuMP Interface}{Status Quo}
-  \small
+  \scriptsize
   \begin{columns}[T]
-    \begin{column}{.42\textwidth}
-      \alert{\bfseries A JuMP model (Rosenbrock)}
+    \begin{column}{.49\textwidth}
+      \alert{\bfseries JuMP $\to$ ExaModels (via the MOI bridge)}
 \begin{lstlisting}
-using JuMP
+using JuMP, ExaModels, CUDA, MadNLPGPU
 
 N = 100
 jm = Model()
 @variable(jm, x[i=1:N],
     start = isodd(i) ? -1.2 : 1.0)
-@objective(jm, Min,
-    sum(100*(x[i+1] - x[i]^2)^2
-        + (1 - x[i])^2 for i = 1:N-1))
-\end{lstlisting}
-    \end{column}
-    \begin{column}{.56\textwidth}
-      \alert{\bfseries Path 1 --- Direct conversion}\par
-\begin{lstlisting}
-using ExaModels, CUDA, MadNLPGPU
+@objective(jm, Min, sum(100*(x[i+1] - x[i]^2)^2
+                       + (1 - x[i])^2 for i = 1:N-1))
 
 em = ExaModel(jm; backend = CUDABackend())
 result = madnlp(em)
 \end{lstlisting}
-      \smallskip
-      \alert{\bfseries Path 2 --- ExaModels as a JuMP optimizer}\par
+    \end{column}
+    \begin{column}{.49\textwidth}
+      \alert{\bfseries Native ExaModels}
 \begin{lstlisting}
-using ExaModels, CUDA, MadNLP, MadNLPGPU
+using ExaModels, CUDA, MadNLPGPU
 
-set_optimizer(jm, () ->
-  ExaModels.Optimizer(MadNLP.madnlp, CUDABackend()))
-optimize!(jm)
+N = 100
+core = ExaCore(backend = CUDABackend())
+@add_var(core, x, N;
+    start = (isodd(i) ? -1.2 : 1.0 for i = 1:N))
+@add_obj(core, 100*(x[i+1] - x[i]^2)^2
+              + (1 - x[i])^2 for i = 1:N-1)
+em = ExaModel(core); madnlp(em)
 \end{lstlisting}
     \end{column}
   \end{columns}
   \smallskip
-  \begin{itemize}\itemsep1pt
-  \item<2-> Both routes share the same MOI bridge; only \texttt{@constraint} / \texttt{@objective} supported (\alert{not \texttt{@NLconstraint} / \texttt{@NLobjective}})
-  \item<3-> But the model-build cost is heavy: at $N=10^5$, the JuMP route takes $\sim 1.7$\,s while \alert{native ExaModels takes $\sim 0.4$\,ms}---a $\sim$4000$\times$ gap, growing with $N$
-  \end{itemize}
+  \scriptsize
+  Bridge alternative: \texttt{set\_optimizer(jm, ExaModels.Optimizer(...))}. Bridge supports \texttt{@constraint} / \texttt{@objective} only (\alert{not legacy \texttt{@NLconstraint} / \texttt{@NLobjective}}).
+  \smallskip
+  \visible<2->{
+  \begin{block}{Model-build cost (Rosenbrock; this desktop)}
+    \centering
+    At $N=10^5$: JuMP route \alert{$\sim 1.74$\,s} vs Native ExaModels \alert{$\sim 0.44$\,ms} \;---\; \alert{$\sim 4000\times$ gap}, growing with $N$.
+  \end{block}
+  }
 \end{frame}
 
 % =============================================================
