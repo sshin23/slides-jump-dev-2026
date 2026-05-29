@@ -322,8 +322,8 @@ optimize!(jm)
   \end{columns}
   \smallskip
   \begin{itemize}\itemsep1pt
-  \item<2-> Both routes share the same MOI bridge: bucket matching expression heads
-  \item<3-> Caveat: only \texttt{@constraint} / \texttt{@objective} supported; \alert{\texttt{@NLconstraint} / \texttt{@NLobjective} are not}
+  \item<2-> Both routes share the same MOI bridge; only \texttt{@constraint} / \texttt{@objective} supported (\alert{not \texttt{@NLconstraint} / \texttt{@NLobjective}})
+  \item<3-> But the model-build cost is heavy: at $N=10^5$, the JuMP route takes $\sim 1.7$\,s while \alert{native ExaModels takes $\sim 0.4$\,ms}---a $\sim$4000$\times$ gap, growing with $N$
   \end{itemize}
 \end{frame}
 
