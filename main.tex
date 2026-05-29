@@ -200,23 +200,23 @@
 \section{Why GPU-native modeling, only for NLPs?}
 % =============================================================
 \begin{frame}{Why a GPU-compatible modeling language?}
+  \small
   \alert{\bfseries LP / QP / conic / SDP --- not strictly needed}
-  \begin{itemize}
-  \item These classes have \alert{canonical forms}: cost vector, constraint matrix, cone description
-  \item Build the data on CPU, transfer once: \alert{a one-shot copy}
-  \item The solver then iterates \alert{entirely on the device}
-  \item The transfer cost is \alert{amortized} over thousands of solver iterations---negligible
+  \begin{itemize}\itemsep1pt
+  \item Canonical forms (cost vector, constraint matrix, cone description) $\Rightarrow$ \alert{one-shot CPU$\to$GPU copy}
+  \item Solver then iterates \alert{entirely on the device}; transfer cost \alert{amortized} over many iterations
   \end{itemize}
   \medskip
   \visible<2->{
   \alert{\bfseries NLP --- the picture is different}
   \begin{columns}[T]
     \begin{column}{.72\textwidth}
-      \begin{itemize}
-      \item No fixed data array: at every iteration the solver \alert{queries the modeling layer} for
+      \begin{itemize}\itemsep1pt
+      \item Solver \alert{queries the modeling layer at every iteration} for
         $f(x),\; g(x),\; \nabla f(x),\; \nabla g(x),\; \nabla^2_{xx} L(x,\lambda)$
-      \item Each query depends on the current iterate---\alert{no one-shot transfer is possible}
-      \item Without a \alert{GPU-native modeling layer}, every iteration pays a CPU$\leftrightarrow$GPU round-trip: \alert{per-iteration cost, not amortized}
+      \item Each query depends on the current iterate---\alert{no one-shot transfer}
+      \item Without GPU-native callbacks, every iteration pays a CPU$\leftrightarrow$GPU round-trip: \alert{per-iteration cost, not amortized}
+      \item JuMP today does \alert{not} emit GPU-native callbacks. That's fine: modeling infrastructure stays on CPU, \alert{as long as the callbacks themselves run on the device}
       \end{itemize}
     \end{column}
     \begin{column}{.26\textwidth}
