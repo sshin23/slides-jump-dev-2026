@@ -260,19 +260,46 @@ optimize!(jm)                                # stay in JuMP, solve on GPU
 % =============================================================
 \section{SIMD abstraction}
 % =============================================================
-\begin{frame}{Pattern--data separation}
+\begin{frame}{An alternative to vectorization}
   \begin{itemize}
-  \item Each objective term / constraint is a \alert{(pattern, data iterator)} pair
-  \item<2-> \alert{Pattern}: a single algebraic expression with free indices into variables, parameters, and a data point
-  \item<3-> \alert{Data iterator}: the collection of data points over which the pattern is evaluated
-  \item<4-> One compiled derivative kernel per pattern, executed across all data points in SIMD fashion
+  \item Two strategies preserve indexed-constraint structure at the modeling layer:
   \end{itemize}
+  \begin{columns}[t]
+    \begin{column}{.48\textwidth}
+      \alert{\bfseries Vectorization}
+      \begin{itemize}
+      \item Express each indexed family as a single matrix-algebra operation
+      \item Canonical: CasADi MX, NumPy-style arrays
+      \item Heterogeneous indexed structure (e.g., ACOPF power balance) requires \alert{pre-built sparse incidence matrices}
+      \end{itemize}
+    \end{column}
+    \begin{column}{.48\textwidth}
+      \visible<2->{
+      \alert{\bfseries Templatizing}
+      \begin{itemize}
+      \item Parameterize a single expression over a \alert{data iterator}; evaluate across instances
+      \item Canonical: Gravity, ExaModels
+      \item Heterogeneous structure handled \alert{directly by the iterator}
+      \end{itemize}
+      }
+    \end{column}
+  \end{columns}
   \medskip
-  \visible<5->{
-    \begin{block}{Design choice}
-      ExaModels \emph{requires} the user to expose pattern structure---in return, it compiles dedicated, GPU-native evaluation kernels.
+  \visible<3->{
+    \begin{block}{ExaModels' SIMD abstraction}
+      Each objective term / constraint = a \alert{(pattern, data iterator)} pair. One compiled derivative kernel per pattern, executed across all data points in SIMD fashion.
     \end{block}
   }
+\end{frame}
+
+\begin{frame}{Pattern--data separation, concretely}
+  \begin{itemize}
+  \item \alert{Pattern}: a single algebraic expression with free indices into variables, parameters, and a data point
+  \item<2-> \alert{Data iterator}: the collection of data points over which the pattern is evaluated
+  \item<3-> Model is stored as a small collection of \texttt{SIMDFunction}s---one per pattern---together with their data
+  \item<4-> Each \texttt{SIMDFunction} bundles: (i) the parameterized expression tree, (ii) compressor maps for the Jacobian/Hessian, (iii) offsets into the global output arrays
+  \item<5-> Constructed once at model compilation, immutable thereafter; updating $x$ or $\theta$ requires \alert{no recompilation}
+  \end{itemize}
 \end{frame}
 
 \begin{frame}{Worked example: Goddard rocket \citep{goddardMethodReachingExtreme1919}}
