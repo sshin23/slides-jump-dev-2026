@@ -398,13 +398,21 @@ optimize!(model)
 % =============================================================
 \section{Benefits of encoding the algebraic structure in the type}
 % =============================================================
-\begin{frame}{Benefits of encoding the algebraic structure in the type}
-  \begin{itemize}\itemsep4pt
+\begin{frame}[fragile]{Benefits of encoding the algebraic structure in the type}
+  \small
+  \begin{itemize}\itemsep2pt
   \item \alert{\bfseries Portability}: same model code on \texttt{CPU()}, \texttt{CUDABackend()}, \texttt{ROCBackend()}, \texttt{OneAPIBackend()}, \texttt{MetalBackend()}, \texttt{OpenCLBackend()} --- one backend keyword switches hardware.
-  \item<2-> \alert{\bfseries Performance}: type-stable end-to-end $\Rightarrow$ Julia compiler inlines AD code per pattern; matches or beats AMPL / JuMP on CPU before any GPU is involved.
-  \item<3-> \alert{\bfseries AOT compatibility}: works under \texttt{juliac --trim=safe} for standalone binaries (no runtime codegen in the hot path) --- demonstrated by \texttt{NLPModelsIpoptLite.jl}.
-  \item<4-> \alert{\bfseries Two-stage + batch}: \texttt{TwoStageExaCore} for first-stage / recourse-stage structure across scenarios; \texttt{BatchExaCore} for many independent NLP instances sharing a structure --- natural fits for stochastic programming and parameter sweeps.
+  \item<2-> \alert{\bfseries Performance}: type-stable end-to-end $\Rightarrow$ Julia compiler inlines AD code per pattern.
+  \item<3-> \alert{\bfseries AOT compatibility}: works under \texttt{juliac --trim=safe} for standalone binaries (no runtime codegen in the hot path).
+  \item<4-> \alert{\bfseries Two-stage + batch}: \texttt{TwoStageExaCore} for first-stage / recourse-stage structure; \texttt{BatchExaCore} for many independent NLP instances sharing a structure.
   \end{itemize}
+  \visible<5->{
+  \medskip
+  \begin{block}{Trade-off: compile-once per algebraic pattern}
+    \lstinputlisting[language={}, basicstyle=\ttfamily\scriptsize, backgroundcolor=\color{white}, frame=none, xleftmargin=0pt, xrightmargin=0pt, aboveskip=0pt, belowskip=0pt]{code/11_recompile_repl.txt}
+    \scriptsize\emph{Identical re-builds hit the cache; structural changes trigger a fresh compile.}
+  \end{block}
+  }
 \end{frame}
 
 % =============================================================
