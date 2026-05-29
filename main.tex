@@ -211,8 +211,8 @@
       \end{itemize}
     \end{column}
     \begin{column}{.49\textwidth}
-      {\scriptsize\itshape Example: AC OPF active-power balance at each bus.\par}
-      \lstinputlisting{code/03_what_is_snippet.jl}
+      {\scriptsize\itshape Example: Goddard rocket --- maximize final altitude.\par}
+      \lstinputlisting[basicstyle=\ttfamily\tiny]{code/03_what_is_snippet.jl}
     \end{column}
   \end{columns}
 \end{frame}
@@ -291,7 +291,7 @@
 % =============================================================
 \section{The ExaModels JuMP Interface}
 % =============================================================
-\begin{frame}[fragile]{The ExaModels JuMP Interface}{Status Quo}
+\begin{frame}[fragile]{The ExaModels JuMP Interface: Status Quo}
   \scriptsize
   \lstinputlisting{code/05_interface_snippet.jl}
   \medskip
@@ -299,8 +299,22 @@
   Bridge supports \texttt{@constraint} / \texttt{@objective} only (\alert{not legacy \texttt{@NLconstraint} / \texttt{@NLobjective}}).
 \end{frame}
 
-\begin{frame}[fragile]{Model-build cost}{JuMP route vs native ExaModels, Rosenbrock at $N=10^5$ on this desktop}
-  \lstinputlisting[language={}, basicstyle=\ttfamily\small, backgroundcolor=\color{mitlightgray!30}, frame=single, framerule=0pt, framesep=6pt, xleftmargin=6pt, xrightmargin=6pt]{code/05_timing_repl.txt}
+\begin{frame}[fragile]{Model-build cost: JuMP route vs native ExaModels (Rosenbrock at $N=10^5$)}
+  \scriptsize
+  \begin{columns}[T]
+    \begin{column}{.49\textwidth}
+      \alert{\bfseries JuMP route}
+      \lstinputlisting{code/06_build_via_jump_snippet.jl}
+      \smallskip
+      \lstinputlisting[language={}, basicstyle=\ttfamily\scriptsize, backgroundcolor=\color{white}, frame=none, xleftmargin=0pt, xrightmargin=0pt, aboveskip=0pt, belowskip=0pt]{code/06_timing_jump.txt}
+    \end{column}
+    \begin{column}{.49\textwidth}
+      \alert{\bfseries Native ExaModels}
+      \lstinputlisting{code/06_build_native_snippet.jl}
+      \smallskip
+      \lstinputlisting[language={}, basicstyle=\ttfamily\scriptsize, backgroundcolor=\color{white}, frame=none, xleftmargin=0pt, xrightmargin=0pt, aboveskip=0pt, belowskip=0pt]{code/06_timing_native.txt}
+    \end{column}
+  \end{columns}
   \medskip
   \visible<2->{
     \begin{block}{Punchline}

@@ -1,0 +1,2 @@
+julia> @btime build_native(10^5);
+  309.411 us (78 allocations: 3.13 MiB)

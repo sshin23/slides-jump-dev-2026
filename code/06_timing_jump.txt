@@ -1,0 +1,2 @@
+julia> @btime build_via_jump(10^5);
+  2.230 s (28307923 allocations: 1.06 GiB)
