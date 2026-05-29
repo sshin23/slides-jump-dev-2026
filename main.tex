@@ -350,19 +350,14 @@ optimize!(model)
 \section{Under the hood}
 % =============================================================
 \begin{frame}{Type-stable expression tree + coloring-free sparse AD}
-  \alert{\bfseries Parameterized expression tree}
-  \begin{itemize}
-  \item Each pattern compiles to a \alert{type-stable} graph; Julia compiler specializes a dedicated evaluator per pattern
-  \item<2-> Same tree, different data and arguments, \alert{no recompilation}
-  \end{itemize}
-  \medskip
-  \visible<3->{
-  \alert{\bfseries Coloring-free sparse AD}
-  \begin{itemize}
-  \item Standard sparse reverse-mode AD uses \alert{graph coloring}---GPU-unfriendly (irregular control flow, dynamic dispatch)
-  \item<4-> ExaModels: \alert{a priori} sparsity analysis per pattern $\Rightarrow$ sparse Jacobian + Lagrangian Hessian in \alert{COO directly, no coloring round}
-  \end{itemize}
-  }
+  \begin{center}
+    \only<1>{\includegraphics[height=.65\textheight]{exa_expression_tree.pdf}}%
+    \only<2->{\includegraphics[height=.65\textheight]{exa_ad_passes.pdf}}%
+  \end{center}
+  \vfill
+  \scriptsize
+  \only<1>{\alert{Type-stable graph} parameterized over data and variables: compiles to a dedicated evaluator per pattern, no recompilation as $x,\theta$ change.}%
+  \only<2->{\alert{Sparse reverse-mode AD without graph coloring}: a priori per-pattern sparsity analysis $\Rightarrow$ Jacobian + Lagrangian Hessian in \alert{COO directly}, no coloring round, GPU-friendly.}%
 \end{frame}
 
 % =============================================================
