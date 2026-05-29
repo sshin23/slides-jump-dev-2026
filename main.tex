@@ -153,48 +153,40 @@
 \begin{document}
 
 \frame{
-  \joint{
-    Joint work with:
-    Fran\c{c}ois Pacaud (MINES Paris-PSL),
-    Alexis Montoison (AMD),
-    Michel Schanen (Argonne),
-    Mihai Anitescu (Argonne)
-  }
   \thispagestyle{empty}
   \titlepage
+  \begin{tikzpicture}[remember picture, overlay]
+    \node[anchor=south, yshift=0.25cm] at (current page.south) {%
+      \tiny
+      \setlength{\tabcolsep}{2pt}%
+      \begin{tabular}{cccccccccc}
+        \includegraphics[width=.42in]{shin.jpeg} &
+        \includegraphics[width=.42in]{michel2323.jpeg} &
+        \includegraphics[width=.42in]{amontoison.jpeg} &
+        \includegraphics[width=.42in]{blegat.png} &
+        \includegraphics[width=.42in]{klamike.png} &
+        \includegraphics[width=.42in]{frapac.jpeg} &
+        \includegraphics[width=.42in]{andrewrosemberg.jpeg} &
+        \includegraphics[width=.42in]{FHoltorf.png} &
+        \includegraphics[width=.42in]{jbcaillau.jpeg} &
+        \includegraphics[width=.42in]{hfytr.png} \\
+        S. Shin & M. Schanen & A. Montoison & B. Legat & M. Klamkin &
+        F. Pacaud & A. Rosemberg & F. Holtorf & J.-B. Caillau & Archim J \\
+        {\color{mitdarkgray}\texttt{@sshin23}} &
+        {\color{mitdarkgray}\texttt{@michel2323}} &
+        {\color{mitdarkgray}\texttt{@amontoison}} &
+        {\color{mitdarkgray}\texttt{@blegat}} &
+        {\color{mitdarkgray}\texttt{@klamike}} &
+        {\color{mitdarkgray}\texttt{@frapac}} &
+        {\color{mitdarkgray}\texttt{@andrewrosemberg}} &
+        {\color{mitdarkgray}\texttt{@FHoltorf}} &
+        {\color{mitdarkgray}\texttt{@jbcaillau}} &
+        {\color{mitdarkgray}\texttt{@hfytr}}
+      \end{tabular}};
+  \end{tikzpicture}
 }
 
 \setbeamertemplate{footline}[content]
-\begin{frame}{Who are we?}
-  \begin{center}
-    \url{https://github.com/exanauts/ExaModels.jl}\\[.15in]
-    \scriptsize
-    \begin{tabular}{ccccc}
-      \includegraphics[width=.6in]{shin.jpeg} &
-      \includegraphics[width=.6in]{michel2323.jpeg} &
-      \includegraphics[width=.6in]{amontoison.jpeg} &
-      \includegraphics[width=.6in]{blegat.png} &
-      \includegraphics[width=.6in]{klamike.png} \\
-      Sungho Shin & Michel Schanen & Alexis Montoison & Beno\^it Legat & Michael Klamkin \\
-      {\color{mitdarkgray}\texttt{@sshin23}} &
-      {\color{mitdarkgray}\texttt{@michel2323}} &
-      {\color{mitdarkgray}\texttt{@amontoison}} &
-      {\color{mitdarkgray}\texttt{@blegat}} &
-      {\color{mitdarkgray}\texttt{@klamike}} \\[1.5ex]
-      \includegraphics[width=.6in]{frapac.jpeg} &
-      \includegraphics[width=.6in]{andrewrosemberg.jpeg} &
-      \includegraphics[width=.6in]{FHoltorf.png} &
-      \includegraphics[width=.6in]{jbcaillau.jpeg} &
-      \includegraphics[width=.6in]{hfytr.png} \\
-      Fran\c{c}ois Pacaud & Andrew Rosemberg & Flemming Holtorf & Jean-Baptiste Caillau & Archim J \\
-      {\color{mitdarkgray}\texttt{@frapac}} &
-      {\color{mitdarkgray}\texttt{@andrewrosemberg}} &
-      {\color{mitdarkgray}\texttt{@FHoltorf}} &
-      {\color{mitdarkgray}\texttt{@jbcaillau}} &
-      {\color{mitdarkgray}\texttt{@hfytr}}
-    \end{tabular}
-  \end{center}
-\end{frame}
 
 % =============================================================
 \section{What is ExaModels?}
