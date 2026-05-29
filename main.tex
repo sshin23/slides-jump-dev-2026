@@ -325,6 +325,34 @@
 
 
 % =============================================================
+\section{Why? JuMP expressions are type-erased}
+% =============================================================
+\begin{frame}[fragile]{Root cause: JuMP stores expressions in non-concrete types}
+  \scriptsize
+  Same nonlinear expression on both sides --- $x^2 + \sin(x)\,y + \cos(y)$.
+  \begin{columns}[T]
+    \begin{column}{.49\textwidth}
+      \alert{\bfseries JuMP}
+      \lstinputlisting{code/07_typestable_jump.jl}
+      \smallskip
+      \lstinputlisting[language={}, basicstyle=\ttfamily\scriptsize, backgroundcolor=\color{white}, frame=none, xleftmargin=0pt, xrightmargin=0pt, aboveskip=0pt, belowskip=0pt]{code/07_typestable_jump_repl.txt}
+    \end{column}
+    \begin{column}{.49\textwidth}
+      \alert{\bfseries ExaModels}
+      \lstinputlisting{code/07_typestable_exa.jl}
+      \smallskip
+      \lstinputlisting[language={}, basicstyle=\ttfamily\scriptsize, backgroundcolor=\color{white}, frame=none, xleftmargin=0pt, xrightmargin=0pt, aboveskip=0pt, belowskip=0pt]{code/07_typestable_exa_repl.txt}
+    \end{column}
+  \end{columns}
+  \medskip
+  \visible<2->{
+  \begin{block}{Why the bridge is slow}
+    \small JuMP's expression args are \alert{\texttt{Vector\{Any\}}} --- iterating pays \alert{per-element type inference + dynamic dispatch}. ExaModels' tree encodes the operator into the type (\texttt{Node2\{+,\dots\}}, \texttt{Node1\{cos,\dots\}}), so the Julia compiler dispatches statically and inlines.
+  \end{block}
+  }
+\end{frame}
+
+% =============================================================
 \section{Under the hood}
 % =============================================================
 \begin{frame}{Type-stable expression tree + coloring-free sparse AD}

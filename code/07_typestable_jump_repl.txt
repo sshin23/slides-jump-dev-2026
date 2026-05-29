@@ -1,0 +1,5 @@
+julia> typeof(f.args)
+Vector{Any}
+
+julia> eltype(f.args)
+Any

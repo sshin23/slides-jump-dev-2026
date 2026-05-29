@@ -1,0 +1,2 @@
+julia> typeof(em.objs[1].f.f)
+Node2{+, Node2{+, ...}, Node1{cos, ...}}
