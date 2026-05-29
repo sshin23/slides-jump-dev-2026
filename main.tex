@@ -371,8 +371,6 @@ optimize!(model)
   \begin{columns}[T]
     \begin{column}{.55\textwidth}
       \scriptsize
-      Per-term Rosenbrock pattern: $\displaystyle f_i(x) = 100\,(x_{i-1}^2 - x_i)^2 + (x_{i-1} - 1)^2$
-      \par\medskip
       \lstinputlisting{code/07_typestable_exa.jl}
       \lstinputlisting[language={}, basicstyle=\ttfamily\color{white}\tiny, backgroundcolor=\color{black}, frame=single, framerule=0pt, framesep=4pt, xleftmargin=4pt, xrightmargin=4pt, aboveskip=4pt, belowskip=0pt]{code/07_typestable_exa_repl.txt}
     \end{column}
@@ -381,9 +379,11 @@ optimize!(model)
       \includegraphics[height=.55\textheight]{exa_expression_tree.pdf}
     \end{column}
   \end{columns}
-  \visible<2->{\smallskip
-    \scriptsize\alert{ExaModels encodes the algebraic structure directly into the type system.} Just by looking at the type, you can read the structure of the expression. At compile time the structure is fully known, so \alert{model creation, AD, and evaluation are specialized for this algebraic expression}.
-  }
+  \begin{itemize}\itemsep1pt
+  \item \alert{ExaModels encodes the algebraic structure directly into the type system}
+  \item Just by looking at the type, you can read the structure of the expression
+  \item<2-> At compile time the structure is fully known $\Rightarrow$ \alert{model creation, AD, and evaluation are specialized for this algebraic expression}
+  \end{itemize}
 \end{frame}
 
 \begin{frame}[fragile]{ExaModels: AD passes through the same typed tree}
