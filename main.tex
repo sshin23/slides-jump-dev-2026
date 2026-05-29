@@ -393,6 +393,28 @@ optimize!(model)
 \end{frame}
 
 % =============================================================
+\section{AOT compile: standalone binary}
+% =============================================================
+\begin{frame}[fragile]{Because the type knows everything: AOT compile to a standalone binary}
+  \scriptsize
+  \begin{columns}[T]
+    \begin{column}{.55\textwidth}
+      Julia source --- a \texttt{ccallable} entry point:
+      \lstinputlisting{code/10_aot_snippet.jl}
+    \end{column}
+    \begin{column}{.43\textwidth}
+      Build + run:
+      \lstinputlisting[language={}, basicstyle=\ttfamily\color{white}\tiny, backgroundcolor=\color{black}, frame=single, framerule=0pt, framesep=4pt, xleftmargin=4pt, xrightmargin=4pt]{code/10_aot_build.txt}
+      \medskip
+      Julia 1.12's \texttt{juliac --trim=safe} produces a standalone binary --- no Julia runtime, no JIT, no surprises at deploy time.
+    \end{column}
+  \end{columns}
+  \visible<2->{\medskip
+    \alert{ExaModels' compile-time-known structure is what makes this possible}: there's no runtime codegen in the hot path, nothing for the trimmer to drop, no dispatch the trimmer can't resolve.
+  }
+\end{frame}
+
+% =============================================================
 \section{Benefits of encoding the algebraic structure in the type}
 % =============================================================
 \begin{frame}[fragile]{Benefits of encoding the algebraic structure in the type}

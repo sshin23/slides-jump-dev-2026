@@ -1,0 +1,2 @@
+$ juliac --trim=safe -o solve my_solve.jl
+$ ./solve   # no Julia runtime needed
