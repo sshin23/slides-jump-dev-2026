@@ -294,9 +294,6 @@
 \begin{frame}[fragile]{The ExaModels JuMP Interface: Status Quo}
   \scriptsize
   \lstinputlisting{code/05_interface_snippet.jl}
-  \medskip
-  \small
-  Bridge supports \texttt{@constraint} / \texttt{@objective} only (\alert{not legacy \texttt{@NLconstraint} / \texttt{@NLobjective}}).
 \end{frame}
 
 \begin{frame}[fragile]{Model-build cost: JuMP route vs native ExaModels (Rosenbrock at $N=10^5$)}
@@ -392,9 +389,8 @@
   \smallskip
   \alert{\bfseries Open}
   \begin{itemize}\itemsep1pt
-  \item<2-> \texttt{@NLconstraint} / \texttt{@NLobjective} not supported by the bridge
-  \item<3-> Heterogeneous indexed structure does not round-trip $\Rightarrow$ use GenOpt.jl or native
-  \item<4-> OpenCL / oneAPI backends held by a GPUCompiler pin (upstream SPIR-V issue)
+  \item<2-> Heterogeneous indexed structure does not round-trip $\Rightarrow$ use GenOpt.jl or native
+  \item<3-> OpenCL / oneAPI backends held by a GPUCompiler pin (upstream SPIR-V issue)
   \end{itemize}
 \end{frame}
 
