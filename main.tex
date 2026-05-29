@@ -189,6 +189,34 @@
 \end{frame}
 
 % =============================================================
+\section{Why GPU-native modeling, only for NLPs?}
+% =============================================================
+\begin{frame}{Why a GPU-compatible modeling language?}
+  \alert{\bfseries LP / QP / conic / SDP --- not strictly needed}
+  \begin{itemize}
+  \item These classes have \alert{canonical forms}: cost vector, constraint matrix, cone description
+  \item Build the data on CPU, transfer once: \alert{a one-shot copy}
+  \item The solver then iterates \alert{entirely on the device}
+  \item The transfer cost is \alert{amortized} over thousands of solver iterations---negligible
+  \end{itemize}
+  \medskip
+  \visible<2->{
+  \alert{\bfseries NLP --- the picture is different}
+  \begin{itemize}
+  \item No fixed data array: at every iteration the solver \alert{queries the modeling layer} for
+    $f(x),\; g(x),\; \nabla f(x),\; \nabla g(x),\; \nabla^2_{xx} L(x,\lambda)$
+  \item Each query depends on the current iterate---\alert{no one-shot transfer is possible}
+  \end{itemize}
+  }
+  \medskip
+  \visible<3->{
+    \begin{block}{Consequence}
+      Without a \alert{GPU-native modeling layer}, every solver iteration pays a CPU$\leftrightarrow$GPU round-trip for derivative evaluation. The cost is \alert{per-iteration}, not amortized---and quickly dominates the GPU solver speedup it was meant to enable.
+    \end{block}
+  }
+\end{frame}
+
+% =============================================================
 \section{The translation layer}
 % =============================================================
 \begin{frame}[fragile]{Two paths from JuMP to ExaModels}
