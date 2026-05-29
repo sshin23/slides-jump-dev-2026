@@ -1,2 +1,1 @@
 $ juliac --trim=safe -o rosenbrock MySolve.jl
-$ ./rosenbrock   # standalone; no Julia runtime

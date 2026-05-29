@@ -14,13 +14,29 @@
   morecomment=[l]{\#},
   morestring=[b]",
 }
+\definecolor{codecomment}{HTML}{006400} % dark green for code comments
+
+\lstdefinestyle{darkrepl}{
+  language={},
+  basicstyle=\ttfamily\color{white}\tiny,
+  backgroundcolor=\color{black},
+  frame=single,
+  frameround=tttt,
+  framerule=0.4pt,
+  rulecolor=\color{black},
+  framesep=4pt,
+  xleftmargin=4pt,
+  xrightmargin=4pt,
+  aboveskip=4pt,
+  belowskip=4pt,
+}
 \lstset{
   language=julia,
   basicstyle=\ttfamily\scriptsize,
   keywordstyle=\color{mitred}\bfseries,
   keywordstyle=[2]\color{mitblue},
   keywordstyle=[3]\color{mitorange}\bfseries,
-  commentstyle=\color{mitdarkgray}\itshape,
+  commentstyle=\color{codecomment}\itshape,
   stringstyle=\color{mitdarkgray},
   showstringspaces=false,
   columns=fullflexible,
@@ -29,7 +45,9 @@
   upquote=true,
   backgroundcolor=\color{mitlightgray!30},
   frame=single,
-  framerule=0pt,
+  frameround=tttt,
+  framerule=0.4pt,
+  rulecolor=\color{mitlightgray!50},
   framesep=4pt,
   xleftmargin=4pt,
   xrightmargin=4pt,
@@ -193,17 +211,19 @@
 % =============================================================
 \begin{frame}[fragile]{What is ExaModels?}
   \begin{columns}[T]
-    \begin{column}{.49\textwidth}
+    \begin{column}{.48\textwidth}
       \begin{itemize}\itemsep4pt
-      \item \alert{Algebraic modeling system} embedded in Julia.
-      \item Builds on \texttt{NLPModels.jl} --- compatible with the broader NLPModels.jl ecosystem: \texttt{Ipopt}, \texttt{MadNLP}, \texttt{KNITRO}, \texttt{Uno}, \dots
-      \item<2-> \alert{\bfseries Killer feature}: \alert{GPU-compatible modeling} --- more on this later.
-      \item<3-> \alert{\bfseries Design philosophy}: not optimized for ease-of-use, optimized for \alert{runtime performance}. Aim: the \alert{fastest modeling system} for building and running optimization solves.
+      \item \alert{Algebraic modeling system} in Julia, JuMP-inspired syntax.
+      \item<2-> Builds on \texttt{NLPModels.jl} --- compatible with: \texttt{Ipopt}, \texttt{MadNLP}, \texttt{KNITRO}, \texttt{Uno}, \dots (essentially all JSO-style solvers)
+      \item<3-> Ships with its own AD system --- $f(x),\; g(x),\; \nabla f(x),\; \nabla g(x),\; \nabla^2_{xx} L(x,\lambda)$
+      \item<4-> \alert{\bfseries Killer feature}: \alert{GPU-compatible modeling} --- more on this later.
+      \item<5-> \alert{\bfseries Design philosophy}: not optimized for ease-of-use, optimized for \alert{runtime performance}. Aim: the \alert{fastest modeling system} for building and running optimization solves.
       \end{itemize}
     \end{column}
-    \begin{column}{.49\textwidth}
+    \begin{column}{.52\textwidth}
+      \vspace{-1em}
       {\scriptsize\itshape Example: Goddard rocket --- maximize final altitude.\par}
-      \lstinputlisting[basicstyle=\ttfamily\fontsize{5pt}{5.6pt}\selectfont]{code/03_what_is_snippet.jl}
+      \lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{6pt}\selectfont]{code/03_what_is_snippet.jl}
     \end{column}
   \end{columns}
 \end{frame}
@@ -220,7 +240,7 @@
       \item Solution copied \alert{once back} to CPU
       \item Transfers can be an overhead, but the cost is \alert{amortized} over many solver iterations
       \item \alert{Existing GPU-native solvers} in this class already work this way: \texttt{CuClarabel}, \texttt{cuPDLP+}~\citep{luCuPDLPFurtherEnhanced2025}
-      \item<2-> $\Rightarrow$ For LP / QP / DCP, a \alert{GPU-native modeling language may not add much value}
+      \item[]<2-> $\Rightarrow$ For LP / QP / DCP, a \alert{GPU-native modeling language may not add much value}
       \end{itemize}
     \end{column}
     \begin{column}{.40\textwidth}
@@ -323,11 +343,12 @@
     \end{column}
   \end{columns}
   \medskip
-  \visible<2->{
-    \begin{block}{Punchline}
-      $\sim$\,\alert{7200$\times$ faster} build, $\sim$\,\alert{360{,}000$\times$ fewer allocations}, $\sim$\,\alert{350$\times$ less memory}. The gap grows with $N$.
-    \end{block}
-  }
+  \normalsize
+  \begin{itemize}\itemsep1pt
+  \item $\sim$\,\alert{7\,200$\times$ faster} build, $\sim$\,\alert{350$\times$ less memory}, $\sim$\,\alert{360{,}000$\times$ fewer allocations}
+  \item<2-> The gap \alert{grows with $N$}
+  \item<3-> ExaModels itself is faster than JuMP, but \alert{most of the overhead is in the JuMP $\to$ ExaModels conversion layer} (next slide)
+  \end{itemize}
 \end{frame}
 
 
@@ -372,7 +393,7 @@ optimize!(model)
     \begin{column}{.55\textwidth}
       \scriptsize
       \lstinputlisting{code/07_typestable_exa.jl}
-      \lstinputlisting[language={}, basicstyle=\ttfamily\color{white}\tiny, backgroundcolor=\color{black}, frame=single, framerule=0pt, framesep=4pt, xleftmargin=4pt, xrightmargin=4pt, aboveskip=4pt, belowskip=0pt]{code/07_typestable_exa_repl.txt}
+      \lstinputlisting[style=darkrepl, belowskip=0pt]{code/07_typestable_exa_repl.txt}
     \end{column}
     \begin{column}{.43\textwidth}
       \centering
@@ -391,7 +412,7 @@ optimize!(model)
     \begin{column}{.55\textwidth}
       \scriptsize
       \lstinputlisting{code/07_typestable_exa.jl}
-      \lstinputlisting[language={}, basicstyle=\ttfamily\color{white}\tiny, backgroundcolor=\color{black}, frame=single, framerule=0pt, framesep=4pt, xleftmargin=4pt, xrightmargin=4pt, aboveskip=4pt, belowskip=0pt]{code/07_typestable_exa_repl.txt}
+      \lstinputlisting[style=darkrepl, belowskip=0pt]{code/07_typestable_exa_repl.txt}
     \end{column}
     \begin{column}{.43\textwidth}
       \centering
@@ -409,45 +430,27 @@ optimize!(model)
 % =============================================================
 \begin{frame}[fragile]{Because the type knows everything: AOT compile to a standalone binary}
   \scriptsize
-  \begin{columns}[T]
-    \begin{column}{.55\textwidth}
-      A simple module that builds a Rosenbrock model:
-      \lstinputlisting{code/10_aot_snippet.jl}
-    \end{column}
-    \begin{column}{.43\textwidth}
-      Compile + run:
-      \lstinputlisting[language={}, basicstyle=\ttfamily\color{white}\tiny, backgroundcolor=\color{black}, frame=single, framerule=0pt, framesep=4pt, xleftmargin=4pt, xrightmargin=4pt]{code/10_aot_build.txt}
-      \medskip
-      Julia 1.12's \texttt{juliac --trim=safe} produces a standalone binary --- no Julia runtime, no JIT, no surprises at deploy time.
-    \end{column}
-  \end{columns}
-  \visible<2->{\medskip
-    \alert{ExaModels' compile-time-known structure is what makes this possible}: there's no runtime codegen in the hot path, nothing for the trimmer to drop, no dispatch the trimmer can't resolve.
-  }
-\end{frame}
-
-% =============================================================
-\section{Benefits of encoding the algebraic structure in the type}
-% =============================================================
-\begin{frame}{Benefits of encoding the algebraic structure in the type}
-  \begin{itemize}\itemsep5pt
-  \item \alert{\bfseries Portability}: same model code on \texttt{CPU()}, \texttt{CUDABackend()}, \texttt{ROCBackend()}, \texttt{OneAPIBackend()}, \texttt{MetalBackend()}, \texttt{OpenCLBackend()} --- one backend keyword switches hardware.
-  \item<2-> \alert{\bfseries Performance}: type-stable end-to-end $\Rightarrow$ Julia compiler inlines AD code per pattern.
-  \item<3-> \alert{\bfseries AOT compatibility}: works under \texttt{juliac --trim=safe} for standalone binaries (no runtime codegen in the hot path).
-  \item<4-> \alert{\bfseries Two-stage + batch}: \texttt{TwoStageExaCore} for first-stage / recourse-stage structure; \texttt{BatchExaCore} for many independent NLP instances sharing a structure.
+  \lstinputlisting{code/10_aot_snippet.jl}
+  \lstinputlisting[style=darkrepl]{code/10_aot_build.txt}
+  \smallskip
+  \small
+  \begin{itemize}\itemsep1pt
+  \item A simple module: build a Rosenbrock model and call Ipopt
+  \item \texttt{juliac --trim=safe} compiles it \alert{without the Julia runtime} --- same idea as a C shared library or executable
+  \item<2-> Possible because the type is \alert{fully inferable at the modeling-function level}: the expression tree is fully known at compile time $\Rightarrow$ kernels for this NLP can be emitted AOT
   \end{itemize}
 \end{frame}
 
 % =============================================================
-\section{Numerical results}
+\section{Portability and performance}
 % =============================================================
-\begin{frame}{Benchmarks}{AD-callback speedup vs CPU-1T baseline, AC OPF (PGLIB-OPF), 4 backends}
+\begin{frame}{Portability and performance}{AD-callback speedup vs CPU-1T baseline, AC OPF (PGLIB-OPF)}
   \centering
-  \includegraphics[width=\textwidth]{exa_backend_scaling.pdf}
-  \begin{itemize}
-  \item<2-> Jacobian / Hessian on CUDA, AMDGPU reach \alert{$>100\times$} at $n_{\text{var}} \sim 10^6$
-  \item<3-> \texttt{obj} / \texttt{cons} sit closer to parity: small per-call work, GPU-launch dominated
-  \item<4-> oneAPI fp64 on Arc A770 is emulated $\Rightarrow$ stays below $1\times$ --- a hardware fact, not a software gap
+  \includegraphics[width=.95\textwidth]{exa_backend_scaling.pdf}
+  \begin{itemize}\itemsep1pt
+  \item Tree complexity \alert{decoupled from the array level}: only \alert{data-level parallelism} is applied; per-data-point ops are scalar Julia, fully type-inferable
+  \item<2-> Same model code runs on \texttt{CPU()}, \texttt{CUDABackend()}, \texttt{ROCBackend()}, \texttt{oneAPIBackend()}, \texttt{MetalBackend()} --- \alert{portable across GPU architectures}
+  \item<3-> Jacobian / Hessian: CUDA, AMDGPU reach \alert{$>100\times$} at $n_{\text{var}} \sim 10^6$; \texttt{oneAPI} fp64 on Arc A770 is emulated $\Rightarrow$ hardware limit, not a software gap
   \end{itemize}
 \end{frame}
 
@@ -466,7 +469,7 @@ optimize!(model)
   \end{columns}
   \visible<2->{
   \medskip
-  \lstinputlisting[language={}, basicstyle=\ttfamily\color{white}\scriptsize, backgroundcolor=\color{black}, frame=single, framerule=0pt, framesep=4pt, xleftmargin=4pt, xrightmargin=4pt]{code/11_recompile_repl.txt}
+  \lstinputlisting[style=darkrepl, basicstyle=\ttfamily\color{white}\scriptsize]{code/11_recompile_repl.txt}
   \scriptsize Identical re-builds hit the cache; the structural change in \texttt{v2} forces a fresh compile.
   }
 \end{frame}
@@ -474,31 +477,14 @@ optimize!(model)
 % =============================================================
 \section{Alternative: ExaModels as a JuMP backend for GPU}
 % =============================================================
-\begin{frame}{Alternative: ExaModels as a JuMP backend for GPU acceleration}{Path: more type stability in JuMP expressions}
+\begin{frame}{Alternative: ExaModels as a JuMP backend for GPU acceleration}{Idea: a small bucket of fully-typed building blocks}
   \begin{itemize}\itemsep4pt
-  \item Use ExaModels as a JuMP \alert{backend specifically for GPU acceleration} --- JuMP stays the user-facing layer; ExaModels generates the GPU-native callbacks under the hood.
-  \item<2-> Key enabler: \alert{more type structure} in JuMP's expression tree, so the JuMP $\to$ ExaModels conversion dispatches statically instead of paying per-element type inference.
-  \item<3-> \alert{Not full type stability} --- the compile-per-pattern cost (previous slide) doesn't fit JuMP's broader audience.
-  \item<4-> \alert{Just enough}: encode the algebraic operator and arity in the expression-tree type. Operand values remain runtime-flexible.
-  \end{itemize}
-\end{frame}
-
-% =============================================================
-\section{Where ExaModels--JuMP stands today}
-% =============================================================
-\begin{frame}{Status quo, May 2026}
-  \small
-  \alert{\bfseries Working today}
-  \begin{itemize}\itemsep1pt
-  \item JuMP $\to$ ExaModels via \texttt{ExaModel(jm; backend = ...)} or \texttt{ExaModels.Optimizer}
-  \item Pattern-preserving JuMP authoring via GenOpt.jl \citep{legatGenOptJl2025}
-  \item MadNLP + MadNLPGPU is the GPU IPM consumer \citep{shinMadNLPjl2025,pacaudCondensedspaceMethodsNonlinear2024}
-  \end{itemize}
-  \smallskip
-  \alert{\bfseries Open}
-  \begin{itemize}\itemsep1pt
-  \item<2-> Heterogeneous indexed structure does not round-trip $\Rightarrow$ use GenOpt.jl or native
-  \item<3-> OpenCL / oneAPI backends held by a GPUCompiler pin (upstream SPIR-V issue)
+  \item Don't ask JuMP to be fully type-stable. Instead, give it a small \alert{bucket of building blocks} that are \alert{fully typed and concrete}
+  \item<2-> $\sim$10 simple shapes of practical significance:
+    \alert{linear}, \alert{quadratic}, \alert{generic polynomial},
+    \alert{polynomial $\times\,\sin$}, \alert{polynomial $\times\,\exp$}, \dots
+  \item<3-> JuMP authors against these blocks; ExaModels executes the conversion \alert{efficiently} over the bucket, with no per-element type inference
+  \item<4-> Makes the JuMP $\to$ ExaModels conversion layer much easier to use --- without forcing JuMP's expression tree to be fully type-stable
   \end{itemize}
 \end{frame}
 
@@ -531,8 +517,6 @@ optimize!(model)
   \tikz[text width=1.1\textwidth,xscale=.9,transform shape]{
     \node at (current page.center) {\printbibliography[heading=none]};
   }
-  \vfill
-  {\tiny\color{mitdarkgray} CPU die image: T.~Schanz (CC-BY-SA 4.0, Wikimedia Commons). NVIDIA A100 image: from S.~Shin's archive (vendor reference).}
 \end{frame}
 
 \end{document}
