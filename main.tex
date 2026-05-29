@@ -416,6 +416,18 @@ optimize!(model)
 \end{frame}
 
 % =============================================================
+\section{Proposal for JuMP developers}
+% =============================================================
+\begin{frame}{Proposal for JuMP developers}{A middle ground between ``no type structure'' and ``full type stability''}
+  \begin{itemize}\itemsep4pt
+  \item If JuMP's expression tree carried \alert{more type structure}, the JuMP $\to$ ExaModels bridge could be \alert{dramatically faster} --- no per-element type inference, no dynamic dispatch.
+  \item<2-> JuMP itself likely benefits too: more compile-time information across the call graph.
+  \item<3-> \alert{But: don't go all the way to ExaModels-style.} The compile-per-pattern cost (previous slide) doesn't fit JuMP's broader audience.
+  \item<4-> \alert{Sweet spot}: encode just enough --- the algebraic operator and arity in the type --- so the bridge can dispatch statically, while leaving operand values runtime-flexible.
+  \end{itemize}
+\end{frame}
+
+% =============================================================
 \section{Where ExaModels--JuMP stands today}
 % =============================================================
 \begin{frame}{Status quo, May 2026}
@@ -464,8 +476,8 @@ optimize!(model)
   \end{itemize}
   \medskip
   \visible<5->{
-    \begin{block}{Open question --- and continuing this thread}
-      \scriptsize We don't need to move all of JuMP onto the GPU. The win is \alert{GPU-native callbacks} eliminating the per-iteration round-trip. \texttt{GenOpt.jl} is a proof-of-concept; \alert{deeper opportunity}: JuMP stores expressions in \alert{non-concrete} types, so the conversion loop pays per-iteration type inference. \alert{Concretely typed expression trees in JuMP would make the bridge cheap.}\\[2pt]
+    \begin{block}{Discussion --- and continuing this thread}
+      \small We don't need to move all of JuMP onto the GPU. The win is \alert{GPU-native callbacks} eliminating the per-iteration round-trip. GenOpt.jl is a proof-of-concept; a slightly more type-stable JuMP expression tree (previous slide) would make the bridge cheap.\\[2pt]
       Continuing at \alert{SIAM Optimization 2026}: ``The State of ExaModels'' (MS369), \alert{Fri June 5, 11:10 BST}, 50 George Square G.03.
     \end{block}
   }
