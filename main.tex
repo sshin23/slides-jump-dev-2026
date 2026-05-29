@@ -212,7 +212,7 @@
 \section{Why GPU-native modeling, only for NLPs?}
 % =============================================================
 \begin{frame}{Why a GPU-compatible modeling language?}{LP / QP / DCP --- not strictly needed}
-  \begin{columns}[c]
+  \begin{columns}[T]
     \begin{column}{.58\textwidth}
       \begin{itemize}
       \item Canonical forms ($A, b, c$, ...) $\Rightarrow$ \alert{one-shot CPU$\to$GPU copy} of problem data
@@ -225,28 +225,23 @@
     \end{column}
     \begin{column}{.40\textwidth}
       \centering
-      \begin{tikzpicture}[every node/.style={font=\scriptsize, align=center}]
-        % --- Layout (LP/QP):
-        %   CPU label at y=4.15; CPU image south at y=2.6 (top ~y=4.05)
-        %   Bus band   y=1.30 to 1.70 (center 1.50)
-        %   GPU image north at y=0.4 (bottom ~y=-0.73)
-        %   GPU label  at y=-0.95
-        % CPU image at top
+      \begin{tikzpicture}[every node/.style={font=\scriptsize, align=center},
+                         baseline={(0,4.20)}]
+        % Fixed bounding box --- identical across LP/QP and NLP slides
+        \useasboundingbox (-2.2, -1.20) rectangle (2.2, 4.20);
+        % --- Static elements (identical on the NLP slide) ---
         \node[anchor=south, inner sep=0] (cpu) at (0, 2.6)
           {\includegraphics[width=2.0cm]{cpu_sungho.jpg}};
         \node[font=\bfseries, color=mitdarkgray] at (0, 3.92) {CPU};
-        % GPU image at bottom
         \node[anchor=north, inner sep=0] (gpu) at (0, 0.4)
           {\includegraphics[width=2.0cm]{exa_a100_gpu.png}};
         \node[font=\bfseries, color=mitred] at (0, -1.00) {GPU};
-        % PCIe / SXM bus band
         \filldraw[fill=mitorange!25, draw=mitorange, line width=0.6pt, rounded corners=2pt]
           (-1.7, 1.30) rectangle (1.7, 1.70);
         \node[font=\scriptsize\bfseries, color=mitorange!60!black] at (0, 1.50) {PCIe / SXM bus};
-        % Arrows: down on left (problem), up on right (solution)
+        % --- Arrows + labels (only this part differs from the NLP slide) ---
         \draw[->, very thick, mitred] (-0.55, 2.55) -- (-0.55, 0.45);
         \draw[->, very thick, mitred] (0.55, 0.45) -- (0.55, 2.55);
-        % Arrow labels in the gaps between bus and CPU/GPU images
         \node[font=\tiny, color=mitdarkgray, anchor=east] at (-0.7, 2.15) {problem\\(once)};
         \node[font=\tiny, color=mitdarkgray, anchor=west] at (0.7, 0.85) {solution\\(once)};
       \end{tikzpicture}
@@ -255,7 +250,7 @@
 \end{frame}
 
 \begin{frame}{Why a GPU-compatible modeling language?}{NLP --- the picture is different}
-  \begin{columns}[c]
+  \begin{columns}[T]
     \begin{column}{.58\textwidth}
       \begin{itemize}\itemsep2pt
       \item Solver \alert{queries the modeling layer at every iteration} for
@@ -267,24 +262,24 @@
     \end{column}
     \begin{column}{.40\textwidth}
       \centering
-      \begin{tikzpicture}[every node/.style={font=\scriptsize, align=center}]
-        % --- Same geometry as LP/QP slide ---
+      \begin{tikzpicture}[every node/.style={font=\scriptsize, align=center},
+                         baseline={(0,4.20)}]
+        % Identical bounding box + static elements as the LP/QP slide
+        \useasboundingbox (-2.2, -1.20) rectangle (2.2, 4.20);
         \node[anchor=south, inner sep=0] (cpu) at (0, 2.6)
           {\includegraphics[width=2.0cm]{cpu_sungho.jpg}};
         \node[font=\bfseries, color=mitdarkgray] at (0, 3.92) {CPU};
         \node[anchor=north, inner sep=0] (gpu) at (0, 0.4)
           {\includegraphics[width=2.0cm]{exa_a100_gpu.png}};
         \node[font=\bfseries, color=mitred] at (0, -1.00) {GPU};
-        % PCIe / SXM bus band
         \filldraw[fill=mitorange!25, draw=mitorange, line width=0.6pt, rounded corners=2pt]
           (-1.7, 1.30) rectangle (1.7, 1.70);
         \node[font=\scriptsize\bfseries, color=mitorange!60!black] at (0, 1.50) {PCIe / SXM bus};
-        % Five bidirectional arrows
+        % --- Arrows + iter labels (only this part differs from the LP/QP slide) ---
         \foreach \i in {0,1,2,3,4} {
           \pgfmathsetmacro{\x}{-0.80 + 0.40*\i}
           \draw[<->, thick, mitred] (\x, 2.55) -- (\x, 0.45);
         }
-        % iter labels: row above bus band; white background occludes arrow shafts at label
         \node[font=\scriptsize, color=mitdarkgray, anchor=east] at (-1.05, 2.15) {iter:};
         \foreach \i in {0,1,2,3,4} {
           \pgfmathsetmacro{\x}{-0.80 + 0.40*\i}
