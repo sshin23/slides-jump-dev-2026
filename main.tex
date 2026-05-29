@@ -211,11 +211,11 @@
 % =============================================================
 \section{Why GPU-native modeling, only for NLPs?}
 % =============================================================
-\begin{frame}{Why a GPU-compatible modeling language?}{LP / QP / conic / DCP --- not strictly needed}
+\begin{frame}{Why a GPU-compatible modeling language?}{LP / QP / DCP --- not strictly needed}
   \begin{columns}[c]
     \begin{column}{.58\textwidth}
       \begin{itemize}
-      \item Canonical forms ($A, b, c$, cone description) $\Rightarrow$ \alert{one-shot CPU$\to$GPU copy} of problem data
+      \item Canonical forms ($A, b, c$, ...) $\Rightarrow$ \alert{one-shot CPU$\to$GPU copy} of problem data
       \item Solver \alert{can iterate entirely on the device}
       \item Solution copied \alert{once back} to CPU
       \item These transfers can be a \alert{significant overhead}, but the cost is \alert{amortized} over many solver iterations
