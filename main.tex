@@ -156,6 +156,16 @@
 
 \graphicspath{{figs/}}
 
+% GitHub-style circular avatar (clip a square image to a circle)
+\newcommand{\circavatar}[2][.42in]{%
+  \begin{tikzpicture}[baseline={(0,0)}]
+    \pgfmathsetlengthmacro{\circradius}{0.5 * #1}
+    \clip (0,0) circle (\circradius);
+    \node[anchor=center,inner sep=0pt] at (0,0)
+      {\includegraphics[width=#1]{#2}};
+  \end{tikzpicture}%
+}
+
 \title[Can ExaModels Power JuMP on GPUs?]{Can ExaModels Power JuMP on GPUs?}
 \subtitle{Pattern-aware modeling and GPU-native automatic differentiation}
 \author{
@@ -178,16 +188,16 @@
       \tiny
       \setlength{\tabcolsep}{2pt}%
       \begin{tabular}{cccccccccc}
-        \includegraphics[width=.42in]{shin.jpeg} &
-        \includegraphics[width=.42in]{michel2323.jpeg} &
-        \includegraphics[width=.42in]{amontoison.jpeg} &
-        \includegraphics[width=.42in]{blegat.png} &
-        \includegraphics[width=.42in]{klamike.png} &
-        \includegraphics[width=.42in]{frapac.jpeg} &
-        \includegraphics[width=.42in]{andrewrosemberg.jpeg} &
-        \includegraphics[width=.42in]{FHoltorf.png} &
-        \includegraphics[width=.42in]{jbcaillau.jpeg} &
-        \includegraphics[width=.42in]{hfytr.png} \\
+        \circavatar{shin.jpeg} &
+        \circavatar{michel2323.jpeg} &
+        \circavatar{amontoison.jpeg} &
+        \circavatar{blegat.png} &
+        \circavatar{klamike.png} &
+        \circavatar{frapac.jpeg} &
+        \circavatar{andrewrosemberg.jpeg} &
+        \circavatar{FHoltorf.png} &
+        \circavatar{jbcaillau.jpeg} &
+        \circavatar{hfytr.png} \\
         S. Shin & M. Schanen & A. Montoison & B. Legat & M. Klamkin &
         F. Pacaud & A. Rosemberg & F. Holtorf & J.-B. Caillau & Archim J \\
         {\color{mitdarkgray}\texttt{@sshin23}} &
@@ -375,7 +385,7 @@
   \begin{tikzpicture}[remember picture, overlay]
     \node[anchor=north east, xshift=-0.15cm, yshift=-0.15cm] at (current page.north east) {%
       \begin{tabular}{c}\scriptsize
-        \includegraphics[width=0.55in]{blegat.png}\\
+        \circavatar[0.55in]{blegat.png}\\
         {\color{mitdarkgray}\texttt{@blegat}}
       \end{tabular}};
   \end{tikzpicture}%
