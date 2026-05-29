@@ -417,20 +417,32 @@ optimize!(model)
 % =============================================================
 \section{Benefits of encoding the algebraic structure in the type}
 % =============================================================
-\begin{frame}[fragile]{Benefits of encoding the algebraic structure in the type}
-  \small
-  \begin{itemize}\itemsep2pt
+\begin{frame}{Benefits of encoding the algebraic structure in the type}
+  \begin{itemize}\itemsep5pt
   \item \alert{\bfseries Portability}: same model code on \texttt{CPU()}, \texttt{CUDABackend()}, \texttt{ROCBackend()}, \texttt{OneAPIBackend()}, \texttt{MetalBackend()}, \texttt{OpenCLBackend()} --- one backend keyword switches hardware.
   \item<2-> \alert{\bfseries Performance}: type-stable end-to-end $\Rightarrow$ Julia compiler inlines AD code per pattern.
   \item<3-> \alert{\bfseries AOT compatibility}: works under \texttt{juliac --trim=safe} for standalone binaries (no runtime codegen in the hot path).
   \item<4-> \alert{\bfseries Two-stage + batch}: \texttt{TwoStageExaCore} for first-stage / recourse-stage structure; \texttt{BatchExaCore} for many independent NLP instances sharing a structure.
   \end{itemize}
-  \visible<5->{
+\end{frame}
+
+\begin{frame}[fragile]{Trade-off: compile-once per algebraic pattern}
+  \scriptsize Each new algebraic pattern triggers a fresh compile. Changing the expression --- even by one term --- counts as a new pattern.
   \medskip
-  \begin{block}{Trade-off: compile-once per algebraic pattern}
-    \lstinputlisting[language={}, basicstyle=\ttfamily\scriptsize, backgroundcolor=\color{white}, frame=none, xleftmargin=0pt, xrightmargin=0pt, aboveskip=0pt, belowskip=0pt]{code/11_recompile_repl.txt}
-    \scriptsize\emph{Identical re-builds hit the cache; structural changes trigger a fresh compile.}
-  \end{block}
+  \begin{columns}[T]
+    \begin{column}{.49\textwidth}
+      \alert{\bfseries v1}
+      \lstinputlisting{code/11_build_v1.jl}
+    \end{column}
+    \begin{column}{.49\textwidth}
+      \alert{\bfseries v2 (added \texttt{sin(x[i])})}
+      \lstinputlisting[moredelim={**[is][\color{mitred}\bfseries]{|}{|}}]{code/11_build_v2.jl}
+    \end{column}
+  \end{columns}
+  \visible<2->{
+  \medskip
+  \lstinputlisting[language={}, basicstyle=\ttfamily\color{white}\scriptsize, backgroundcolor=\color{black}, frame=single, framerule=0pt, framesep=4pt, xleftmargin=4pt, xrightmargin=4pt]{code/11_recompile_repl.txt}
+  \scriptsize Identical re-builds hit the cache; the structural change in \texttt{v2} forces a fresh compile.
   }
 \end{frame}
 
