@@ -19,34 +19,48 @@
 }
 \definecolor{codecomment}{HTML}{006400} % dark green for code comments
 
-% Julia REPL palette (matches the OhMyREPL / default Julia colors):
-%   julia>  -> bold green;    # comments -> grey;   numbers/units -> sky blue
-\definecolor{replprompt}{HTML}{4DAD5E}
-\definecolor{replcomment}{HTML}{8E9AA0}
-\definecolor{repltime}{HTML}{4FA8DB}
+% OhMyREPL Monokai24bit palette (the default scheme that loads when you
+% `using OhMyREPL` in a 24-bit-color terminal). Hex values lifted from
+% _create_monokai_24() in OhMyREPL/src/passes/colorschemes.jl.
+\definecolor{omrPrompt}{HTML}{00CD00}    % julia>           Base Julia, ANSI green
+\definecolor{omrNumber}{HTML}{AE81FF}    % numerics + symbols
+\definecolor{omrComment}{HTML}{595959}   % # ...
+\definecolor{omrString}{HTML}{E6DB74}    % "..."
+\definecolor{omrCall}{HTML}{66D9EF}      % f(...)
+\definecolor{omrOp}{HTML}{F92672}        % operators, keywords, bool literals
+\definecolor{omrMacro}{HTML}{66D9EF}     % @time, @variable, ...
+\definecolor{omrText}{HTML}{F8F8F2}      % canonical Monokai foreground
 
 \lstdefinelanguage{juliarepl}{
   morecomment=[l]{\#},
-  morekeywords={ms,us,s,ns,Hz,kHz,GHz,GiB,MiB,KiB,GB,MB,kB},
+  morestring=[b]",
+  morekeywords={function,end,for,if,else,elseif,while,let,do,begin,return,using,import,struct,abstract,mutable,type,const,global,local,where,break,continue,quote,in,true,false,nothing,Inf,NaN},
+  morekeywords=[2]{@time,@btime,@elapsed,@allocated,@variable,@constraint,@objective,@NLconstraint,@NLobjective,@add_var,@add_par,@add_obj,@add_con,@add_con!,@add_expr,@register_univariate,@register_bivariate},
   sensitive=true,
-  literate={julia>}{{{\color{replprompt}\bfseries julia>}}}{6}
-           {0}{{{\color{repltime}0}}}{1}
-           {1}{{{\color{repltime}1}}}{1}
-           {2}{{{\color{repltime}2}}}{1}
-           {3}{{{\color{repltime}3}}}{1}
-           {4}{{{\color{repltime}4}}}{1}
-           {5}{{{\color{repltime}5}}}{1}
-           {6}{{{\color{repltime}6}}}{1}
-           {7}{{{\color{repltime}7}}}{1}
-           {8}{{{\color{repltime}8}}}{1}
-           {9}{{{\color{repltime}9}}}{1},
+  literate={julia>}{{{\color{omrPrompt}\bfseries julia>}}}{6}
+           {0}{{{\color{omrNumber}0}}}{1}
+           {1}{{{\color{omrNumber}1}}}{1}
+           {2}{{{\color{omrNumber}2}}}{1}
+           {3}{{{\color{omrNumber}3}}}{1}
+           {4}{{{\color{omrNumber}4}}}{1}
+           {5}{{{\color{omrNumber}5}}}{1}
+           {6}{{{\color{omrNumber}6}}}{1}
+           {7}{{{\color{omrNumber}7}}}{1}
+           {8}{{{\color{omrNumber}8}}}{1}
+           {9}{{{\color{omrNumber}9}}}{1}
+           {+}{{{\color{omrOp}+}}}{1}
+           {-}{{{\color{omrOp}-}}}{1}
+           {*}{{{\color{omrOp}*}}}{1}
+           {=}{{{\color{omrOp}=}}}{1},
 }
 
 \lstdefinestyle{darkrepl}{
   language=juliarepl,
-  basicstyle=\ttfamily\color{white}\scriptsize,
-  commentstyle=\color{replcomment}\itshape,
-  keywordstyle=\color{repltime}\bfseries,
+  basicstyle=\ttfamily\color{omrText}\scriptsize,
+  commentstyle=\color{omrComment}\itshape,
+  keywordstyle=\color{omrOp}\bfseries,
+  keywordstyle=[2]\color{omrMacro}\bfseries,
+  stringstyle=\color{omrString},
   backgroundcolor=,
   frame=none,
   framesep=0pt,
@@ -438,7 +452,7 @@
   \smallskip
   \small
   \begin{itemize}\itemsep1pt
-  \item JuMP \alert{unrolls the expression at construction} into a flat \texttt{Vector\{Any\}} --- structure lives only in the runtime element types
+  \item JuMP stores the objective as an \alert{enumerated array of expression trees} in a flat \texttt{Vector\{Any\}} --- element types are erased, so static type inference can't see what's inside
   \item<2-> The ExaModels--JuMP extension walks every node, \alert{infers its type}, and classifies it into an operator pattern ($x^2$, $\sin x$, $\exp x$, $\dots$) --- \alert{this per-node type inference dominates the cost}
   \item<3-> The tree representation is fine; what we need is a \alert{type-inferable} tree so iteration is cheap
   \end{itemize}
