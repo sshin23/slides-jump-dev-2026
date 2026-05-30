@@ -630,20 +630,20 @@ optimize!(model)
   \smallskip
   \begin{itemize}\itemsep2pt
   % \item ExaModels offers a \alert{SIMD abstraction} for NLPs --- pattern + data iterator
-  \item<2-> Encoding the algebraic structure in the type buys us \alert{GPU-native callbacks}, portability, and \alert{AOT compilation}
-  \item<3-> The trade-off: \alert{all the burden goes onto the compiler} --- great when patterns are stable, expensive when they change
+  \item Encoding the algebraic structure in the type buys us \alert{GPU-native callbacks}, portability, and \alert{AOT compilation}
+  \item The trade-off: \alert{all the burden goes onto the compiler} --- great when patterns are stable, expensive when they change
   \end{itemize}
   \smallskip
-  \visible<4->{
+  \visible<2->{
     \begin{block}{Discussion}
       \small We don't need to move all of JuMP onto the GPU. The win is \alert{GPU-native callbacks} eliminating the per-iteration round-trip. A slightly more type-stable JuMP tree would make the bridge cheap.
     \end{block}
   }
-  \visible<5->{
+  \visible<3->{
     \begin{exampleblock}{Continuing this thread at SIAM Optimization 2026}
       \small ``The State of ExaModels'' --- MS369, \alert{Fri June 5, 11:10 BST}.
     \end{exampleblock}
-  }
+  }o
 \end{frame}
 
 % --- Re-show the title page as the closing slide ---
