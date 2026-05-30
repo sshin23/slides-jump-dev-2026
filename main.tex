@@ -210,7 +210,7 @@
 }
 
 \title[Can ExaModels Power JuMP on GPUs?]{Can ExaModels Power JuMP on GPUs?}
-\subtitle{Pros and Cons of Aggressive Typing}
+\subtitle{Blessing and curse of aggressive typing}
 \author{
   Sungho Shin\\
   \url{shin.mit.edu}
@@ -270,13 +270,13 @@
       \item<2-> Builds on \texttt{NLPModels.jl} --- compatible with: \texttt{Ipopt}, \texttt{MadNLP}, \texttt{KNITRO}, \texttt{Uno}, \dots (essentially all JSO-style solvers)
       \item<3-> Ships with its own AD system --- $f(x),\; g(x),\; \nabla_{x} f(x),\; \nabla_{x} g(x),\; \nabla^2_{xx} L(x,\lambda)$
       \item<4-> \alert{\bfseries Killer feature}: \alert{GPU-compatible modeling} --- more on this later.
-      \item<5-> \alert{\bfseries Design philosophy}: not optimized for ease-of-use, optimized for \alert{runtime performance}. Aim: the \alert{fastest modeling system} for building and running optimization solves.
+      \item<5-> \alert{\bfseries Design philosophy}: not optimized for ease-of-use, optimized for \alert{runtime performance}. Aim: the \alert{fastest modeling system} for building and running optimization solves.  
       \end{itemize}
     \end{column}
     \begin{column}{.52\textwidth}
-      \vspace{-1em}
+      \vspace{-2.25em}
       {\scriptsize\itshape Example: Goddard rocket --- maximize final altitude.\par}
-      \begin{codebox}\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{6pt}\selectfont]{code/03_what_is_snippet.jl}\end{codebox}
+      \begin{codebox}\lstinputlisting[basicstyle=\ttfamily\fontsize{6.5pt}{6.5pt}\selectfont]{code/03_what_is_snippet.jl}\end{codebox}
     \end{column}
   \end{columns}
 \end{frame}
@@ -524,13 +524,14 @@ optimize!(model)
 \section{AOT compile: standalone binary}
 % =============================================================
 \begin{frame}[fragile]{Because the type knows everything: AOT compile to a standalone binary}
-  \scriptsize
-  \begin{codebox}\lstinputlisting{code/10_aot_snippet.jl}\end{codebox}
-  \begin{replbox}\lstinputlisting[style=darkrepl]{code/10_aot_build.txt}\end{replbox}
+  \begin{scriptsize}
+    \begin{codebox}\lstinputlisting{code/10_aot_snippet.jl}\end{codebox}
+    \begin{replbox}\lstinputlisting[style=darkrepl]{code/10_aot_build.txt}\end{replbox}
+  \end{scriptsize}
   \smallskip
   \begin{itemize}\itemsep1pt
   \item Aggressive typing applies at the \alert{whole \texttt{ExaModel}}, not just the expression tree
-  \item<2-> Possible because the type is \alert{fully inferable at the modeling-function level} $\Rightarrow$ kernels for this NLP can be emitted AOT
+  \item<2-> Possible because the type is \alert{fully inferable at the modeling-function level}
   \end{itemize}
 \end{frame}
 
@@ -549,18 +550,19 @@ optimize!(model)
 \end{frame}
 
 \begin{frame}[fragile]{Trade-off: compile-once per algebraic pattern}
-  \scriptsize
-  \begin{columns}[T]
-    \begin{column}{.49\textwidth}
-      \begin{codebox}\lstinputlisting{code/11_build_v1.jl}\end{codebox}
-    \end{column}
-    \begin{column}{.49\textwidth}
-      \begin{codebox}\lstinputlisting[moredelim={**[is][\color{mitred}\bfseries]{|}{|}}]{code/11_build_v2.jl}\end{codebox}
-    \end{column}
-  \end{columns}
-  \visible<2->{
-    \begin{replbox}\lstinputlisting[style=darkrepl]{code/11_recompile_repl.txt}\end{replbox}
-  }
+  \begin{scriptsize}
+    \begin{columns}[T]
+      \begin{column}{.49\textwidth}
+        \begin{codebox}\lstinputlisting{code/11_build_v1.jl}\end{codebox}
+      \end{column}
+      \begin{column}{.49\textwidth}
+        \begin{codebox}\lstinputlisting[moredelim={**[is][\color{mitred}\bfseries]{|}{|}}]{code/11_build_v2.jl}\end{codebox}
+      \end{column}
+    \end{columns}
+    \visible<2->{
+      \begin{replbox}\lstinputlisting[style=darkrepl]{code/11_recompile_repl.txt}\end{replbox}
+    }
+  \end{scriptsize}
   \begin{itemize}\itemsep1pt
   \item<3-> Same algebraic pattern $\Rightarrow$ \alert{cached, instant rebuild}
   \item<4-> A \alert{slight change} (one extra term) $\Rightarrow$ \alert{everything recompiles} ($\sim$99\% compilation time)
