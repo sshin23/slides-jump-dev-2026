@@ -10,7 +10,7 @@
 \tcbuselibrary{skins,listings,breakable}
 
 \lstdefinelanguage{julia}{
-  morekeywords={using,end,function,return,for,in,if,else,elseif,while,let,do,begin,struct,abstract,mutable,type,const,global,local,where,break,continue,quote,true,false,nothing,Inf},
+  morekeywords={using,end,function,return,for,in,if,else,elseif,while,let,do,begin,module,baremodule,struct,abstract,mutable,type,const,global,local,where,break,continue,quote,true,false,nothing,Inf},
   morekeywords=[2]{ExaCore,ExaModel,Model,Optimizer,CUDABackend,ROCBackend,OneAPIBackend,MetalBackend,OpenCLBackend,CPU,CuArray},
   morekeywords=[3]{@add_var,@add_par,@add_obj,@add_con,@add_con!,@add_expr,@register_univariate,@register_bivariate,@variable,@constraint,@objective,@NLconstraint,@NLobjective},
   sensitive=true,
@@ -24,7 +24,7 @@
 % _create_monokai_24() in OhMyREPL/src/passes/colorschemes.jl.
 \definecolor{omrPrompt}{HTML}{00CD00}    % julia>           Base Julia, ANSI green
 \definecolor{omrNumber}{HTML}{AE81FF}    % numerics + symbols
-\definecolor{omrComment}{HTML}{595959}   % # ...
+\definecolor{omrComment}{HTML}{9A9A9A}   % # ...   (brighter than the Monokai #595959 so it's clearly grey on a black REPL bg)
 \definecolor{omrString}{HTML}{E6DB74}    % "..."
 \definecolor{omrCall}{HTML}{66D9EF}      % f(...)
 \definecolor{omrOp}{HTML}{F92672}        % operators, keywords, bool literals
@@ -575,9 +575,9 @@ optimize!(model)
 % =============================================================
 \section{Alternative: ExaModels as a JuMP backend for GPU}
 % =============================================================
-\begin{frame}{Alternative: ExaModels as a JuMP backend for GPU acceleration}{Idea: a small bucket of fully-typed building blocks}
+\begin{frame}{Alternative: ExaModels as a JuMP backend for GPU acceleration}{Idea: a small number of fully-typed buckets}
   \begin{itemize}\itemsep2pt
-  \item Don't ask JuMP to be fully type-stable. Give it a small \alert{bucket of building blocks} that are \alert{fully typed and concrete}
+  \item Don't ask JuMP to be fully type-stable. Give it a \alert{small number of buckets} --- each potentially large --- whose contents are \alert{fully typed and concrete}
   \item<2-> $\sim$10 patterns of practical significance: \alert{linear}, \alert{quadratic}, \alert{bilinear}, \alert{poly $\times\,\sin$}, \alert{poly $\times\,\exp$}, \dots, plus an \alert{Any fallback} bucket for anything else
   \end{itemize}
   \visible<2->{
@@ -615,7 +615,8 @@ optimize!(model)
     \smallskip
   }
   \begin{itemize}\itemsep2pt
-  \item<3-> JuMP authors against these blocks; ExaModels \alert{dispatches statically} on the common patterns and falls back to per-element type inference only for the \texttt{Any} bucket
+  \item<3-> JuMP authors against these blocks; ExaModels \alert{dispatches statically} on the common patterns; the \texttt{Any} bucket keeps today's per-element inference path
+  \item<4-> Implication for JuMP: a move from \alert{purely interpreted} model construction toward \alert{more typed + compiled} --- good and bad. Just an idea.
   \end{itemize}
 \end{frame}
 
@@ -636,12 +637,12 @@ optimize!(model)
   \smallskip
   \visible<4->{
     \begin{block}{Discussion}
-      \scriptsize We don't need to move all of JuMP onto the GPU. The win is \alert{GPU-native callbacks} eliminating the per-iteration round-trip. A slightly more type-stable JuMP tree would make the bridge cheap.
+      \small We don't need to move all of JuMP onto the GPU. The win is \alert{GPU-native callbacks} eliminating the per-iteration round-trip. A slightly more type-stable JuMP tree would make the bridge cheap.
     \end{block}
   }
   \visible<5->{
     \begin{exampleblock}{Continuing this thread at SIAM Optimization 2026}
-      \scriptsize ``The State of ExaModels'' --- MS369, \alert{Fri June 5, 11:10 BST}.
+      \small ``The State of ExaModels'' --- MS369, \alert{Fri June 5, 11:10 BST}.
     \end{exampleblock}
   }
 \end{frame}
