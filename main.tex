@@ -326,7 +326,6 @@
         \node[font=\bfseries, color=mitred] at (0, -1.15) {GPU};
         \filldraw[fill=mitorange!25, draw=mitorange, line width=0.6pt, rounded corners=2pt]
           (-2.05, 1.25) rectangle (2.05, 1.75);
-        \node[font=\scriptsize\bfseries, color=mitorange!60!black] at (0, 1.50) {PCIe / SXM bus};
         % --- DYNAMIC: LP/QP arrows + labels (overlay 1) ---
         \only<1>{
           \draw[->, very thick, mitred] (-0.65, 2.65) -- (-0.65, 0.45);
@@ -349,6 +348,10 @@
           \node[font=\tiny\bfseries, color=mitred, anchor=west, fill=white, inner sep=1pt]
             at (1.30, 2.20) {$\cdots$};
         }
+        % --- PCIe / SXM bus label LAST so it sits on top of the arrows ---
+        \node[font=\scriptsize\bfseries, color=mitorange!60!black,
+              fill=mitorange!25, inner sep=2pt]
+          at (0, 1.50) {PCIe / SXM bus};
       \end{tikzpicture}
     \end{column}
   \end{columns}
@@ -450,11 +453,11 @@
 % =============================================================
 \section{One remedy: piggyback on JuMP (GenOpt.jl)}
 % =============================================================
-\begin{frame}[fragile]{One remedy: piggyback on JuMP (\texttt{GenOpt.jl} \citep{legatGenOptJl2025})}
+\begin{frame}[fragile]{One remedy: piggyback on JuMP (\texttt{GenOpt.jl} by \texttt{@blegat})}
   \begin{tikzpicture}[remember picture, overlay]
-    \node[anchor=north east, xshift=-0.15cm, yshift=-0.15cm] at (current page.north east) {%
-      \begin{tabular}{c}\scriptsize
-        \circavatar[0.55in]{blegat.png}\\
+    \node[anchor=north east, xshift=-0.2cm, yshift=-0.15cm] at (current page.north east) {%
+      \begin{tabular}{c}\tiny
+        \circavatar[0.35in]{blegat.png}\\[-1pt]
         {\color{mitdarkgray}\texttt{@blegat}}
       \end{tabular}};
   \end{tikzpicture}%
