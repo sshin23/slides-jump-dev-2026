@@ -1,19 +1,19 @@
 \begin{tikzpicture}[
-  scale=0.85, transform shape,
+  scale=0.95, transform shape,
   nd/.style={rectangle, rounded corners=3pt, draw=gray!60, thick, fill=white,
-    minimum height=7.5mm, minimum width=10mm, inner sep=2pt, font=\footnotesize\ttfamily},
+    minimum height=8mm, minimum width=12mm, inner sep=2pt, font=\small\ttfamily},
   ndvar/.style={nd, draw=j1!80, fill=j1!10},
   ndconst/.style={nd, draw=j4!70, fill=j4!8},
   fwd/.style={font=\scriptsize, text=ForestGreen},
   rev/.style={font=\scriptsize, text=Maroon},
   edge from parent/.style={draw, gray!60, semithick},
-  level 1/.style={sibling distance=68mm, level distance=16mm},
-  level 2/.style={sibling distance=34mm, level distance=16mm},
-  level 3/.style={sibling distance=28mm, level distance=16mm},
-  level 4/.style={sibling distance=20mm, level distance=16mm},
+  level 1/.style={sibling distance=72mm, level distance=18mm},
+  level 2/.style={sibling distance=36mm, level distance=18mm},
+  level 3/.style={sibling distance=28mm, level distance=18mm},
+  level 4/.style={sibling distance=22mm, level distance=18mm},
 ]
 
-% --- Single tree with both annotations ---
+% --- Tree ---
 \node[nd] (plus) {$+$}
   child { node[nd] (times) {$\times$}
     child { node[ndconst] (c100) {100} }
@@ -33,51 +33,51 @@
     }
   };
 
-% --- Forward pass annotations (green, right side) ---
-\node[fwd, right=4pt of plus, anchor=west] {$v = 100s^2 + t^2$};
-\node[fwd, left=4pt of times, anchor=east] {$\partial_1 = s^2,\; \partial_2 = 100$};
-\node[fwd, right=4pt of sq1, anchor=west] {$v = s^2,\; F' = 2s$};
-\node[fwd, left=4pt of sub1, anchor=east] {$\partial_1 = 1,\; \partial_2 = {-}1$};
-\node[fwd, left=4pt of sq2, anchor=east] {$v = a^2,\; F' = 2a$};
-\node[fwd, right=4pt of sq3, anchor=west] {$v = t^2,\; F' = 2t$};
-\node[fwd, right=4pt of sub2, anchor=west] {$\partial_1 = 1,\; \partial_2 = {-}1$};
+% --- Forward pass annotations (green, to the side) ---
+\node[fwd, right=4pt of plus, anchor=west]  {$v = 100s^2 + t^2$};
+\node[fwd, left=4pt of times, anchor=east]  {$\partial_1 = s^2,\; \partial_2 = 100$};
+\node[fwd, right=4pt of sq1, anchor=west]   {$v = s^2,\; F' = 2s$};
+\node[fwd, left=4pt of sub1, anchor=east]   {$\partial_1 = 1,\; \partial_2 = {-}1$};
+\node[fwd, left=4pt of sq2, anchor=east]    {$v = a^2,\; F' = 2a$};
+\node[fwd, right=4pt of sq3, anchor=west]   {$v = t^2,\; F' = 2t$};
+\node[fwd, right=4pt of sub2, anchor=west]  {$\partial_1 = 1,\; \partial_2 = {-}1$};
 
-% --- Reverse pass annotations (maroon, arrows with edge labels) ---
-\node[rev, above=2pt of plus, anchor=south] {$\bar{v} = 1$};
+% --- Reverse-pass seed ---
+\node[rev, above=3pt of plus, anchor=south] {$\bar{v} = 1$};
 
-% Adjoint propagation arrows (dashed, maroon)
-\draw[->, Maroon, semithick, dashed] ([xshift=-2pt]plus.south west) --
-  node[left, rev, pos=0.4] {$\bar{v}{\cdot}1$} ([xshift=2pt]times.north east);
-\draw[->, Maroon, semithick, dashed] ([xshift=2pt]plus.south east) --
-  node[right, rev, pos=0.4] {$\bar{v}{\cdot}1$} ([xshift=-2pt]sq3.north west);
+% --- Adjoint arrows (dashed, maroon) -- aligned at each parent's south edge ---
+\draw[->, Maroon, semithick, dashed] (plus.south west) --
+  node[left, rev, pos=0.45]  {$\bar{v}{\cdot}1$} (times.north east);
+\draw[->, Maroon, semithick, dashed] (plus.south east) --
+  node[right, rev, pos=0.45] {$\bar{v}{\cdot}1$} (sq3.north west);
 
-\draw[->, Maroon, semithick, dashed] ([xshift=2pt]times.south east) --
-  node[right, rev, pos=0.4] {$1{\cdot}100$} ([xshift=-2pt]sq1.north west);
+\draw[->, Maroon, semithick, dashed] (times.south east) --
+  node[right, rev, pos=0.45] {$1{\cdot}100$} (sq1.north west);
 
 \draw[->, Maroon, semithick, dashed] (sq1.south) --
-  node[right, rev, pos=0.4] {$100{\cdot}2s$} (sub1.north);
+  node[right, rev, pos=0.5] {$100{\cdot}2s$} (sub1.north);
 
-\draw[->, Maroon, semithick, dashed] ([xshift=-2pt]sub1.south west) --
-  node[left, rev, pos=0.4] {$200s{\cdot}1$} ([xshift=2pt]sq2.north east);
-\draw[->, Maroon, semithick, dashed] ([xshift=2pt]sub1.south east) --
-  node[right, rev, pos=0.4] {$200s{\cdot}({-}1)$} ([xshift=-2pt]vb.north west);
+\draw[->, Maroon, semithick, dashed] (sub1.south west) --
+  node[left, rev, pos=0.45]  {$200s{\cdot}1$} (sq2.north east);
+\draw[->, Maroon, semithick, dashed] (sub1.south east) --
+  node[right, rev, pos=0.45] {$200s{\cdot}({-}1)$} (vb.north west);
 
 \draw[->, Maroon, semithick, dashed] (sq2.south) --
-  node[left, rev, pos=0.4] {$200s{\cdot}2a$} (va1.north);
+  node[left, rev, pos=0.5]   {$200s{\cdot}2a$} (va1.north);
 
 \draw[->, Maroon, semithick, dashed] (sq3.south) --
-  node[right, rev, pos=0.4] {$1{\cdot}2t$} (sub2.north);
-\draw[->, Maroon, semithick, dashed] ([xshift=-2pt]sub2.south west) --
-  node[left, rev, pos=0.4] {$2t{\cdot}1$} ([xshift=2pt]va2.north east);
+  node[right, rev, pos=0.5]  {$1{\cdot}2t$} (sub2.north);
+\draw[->, Maroon, semithick, dashed] (sub2.south west) --
+  node[left, rev, pos=0.45]  {$2t{\cdot}1$} (va2.north east);
 
-% --- Gradient results at leaves ---
-\node[rev, font=\scriptsize\bfseries, below=4pt of va1, anchor=north] {$\nabla\!f[a] \mathrel{+}= 400sa$};
-\node[rev, font=\scriptsize\bfseries, below=4pt of vb, anchor=north] {$\nabla\!f[b] \mathrel{+}= {-}200s$};
-\node[rev, font=\scriptsize\bfseries, below=4pt of va2, anchor=north] {$\nabla\!f[a] \mathrel{+}= 2t$};
+% --- Gradient accumulators at the Var leaves ---
+\node[rev, font=\scriptsize\bfseries, below=6pt of va1, anchor=north] {$\nabla\!f[a] \mathrel{+}= 400sa$};
+\node[rev, font=\scriptsize\bfseries, below=6pt of vb,  anchor=north] {$\nabla\!f[b] \mathrel{+}= {-}200s$};
+\node[rev, font=\scriptsize\bfseries, below=6pt of va2, anchor=north] {$\nabla\!f[a] \mathrel{+}= 2t$};
 
 % --- Legend ---
-\node[anchor=north, font=\scriptsize] at ([yshift=-5mm]current bounding box.south) {
-  \textcolor{ForestGreen}{\rule{8pt}{2pt}}~Forward (primal $v$, local derivatives)\qquad
-  \textcolor{Maroon}{\rule{8pt}{2pt}}~\textcolor{Maroon}{- -}~Reverse (adjoint $\bar{v}$ propagation)
+\node[anchor=north, font=\footnotesize, yshift=-8mm] at (current bounding box.south) {%
+  \textcolor{ForestGreen}{\rule{10pt}{2pt}}\,~Forward (primal $v$, local derivatives)\qquad
+  \textcolor{Maroon}{- -\,$\blacktriangleright$}\,~Reverse (adjoint $\bar{v}$ propagation)
 };
 \end{tikzpicture}
