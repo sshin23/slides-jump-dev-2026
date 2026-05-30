@@ -540,7 +540,7 @@ optimize!(model)
   \visible<2->{
   \medskip
   \begin{replbox}\lstinputlisting[style=darkrepl]{code/11_recompile_repl.txt}\end{replbox}
-  \scriptsize Identical re-builds hit the cache; the structural change in \texttt{v2} forces a fresh compile.
+  \scriptsize Same pattern $\Rightarrow$ cached. Different pattern $\Rightarrow$ fresh compile of \alert{similar cost} ($v1$ cold $\approx v2$ cold).
   }
 \end{frame}
 

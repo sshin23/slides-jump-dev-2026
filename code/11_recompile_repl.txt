@@ -1,8 +1,8 @@
-julia> @time em = build_v1(1000);
-  1.307 s   # cold compile
+julia> @time em = build_v1(1000);   # 1st call: fresh pattern compile
+  170 ms
 
-julia> @time em = build_v1(1000);
-  33 us     # cached pattern, no recompile
+julia> @time em = build_v1(1000);   # 2nd call: pattern cached, no recompile
+  33 us
 
-julia> @time em = build_v2(1000);   # *different* algebraic pattern
-  169 ms    # fresh compile
+julia> @time em = build_v2(1000);   # different pattern: fresh compile
+  175 ms
