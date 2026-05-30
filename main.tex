@@ -440,10 +440,9 @@
     \end{column}
   \end{columns}
   \smallskip
-  \small
   \begin{itemize}\itemsep1pt
-  \item JuMP stores the objective as an \alert{enumerated array of expression trees} in a flat \texttt{Vector\{Any\}} --- element types are erased, so static type inference can't see what's inside
-  \item<2-> The ExaModels--JuMP extension walks every node, \alert{infers its type}, and classifies it into an operator pattern ($x^2$, $\sin x$, $\exp x$, $\dots$) --- \alert{this per-node type inference dominates the cost}
+  \item JuMP stores the objective as an \alert{enumerated array of expression trees} in a flat \texttt{Vector\{Any\}} --- element types erased
+  \item<2-> The ExaModels--JuMP extension walks every node, \alert{infers its type}, classifies it into an operator pattern ($x^2$, $\sin x$, $\exp x$, $\dots$) --- \alert{per-node type inference dominates the cost}
   \end{itemize}
 \end{frame}
 
@@ -515,8 +514,9 @@ optimize!(model)
     \end{column}
   \end{columns}
   \begin{itemize}\itemsep1pt
-  \item Forward primals (green) and reverse adjoints (red) propagate through the \emph{same typed tree}
-  \item<2-> \alert{Per-pattern sparsity is known at compile time} $\Rightarrow$ Jacobian + Hessian assembled in COO directly, \alert{no coloring round}, GPU-friendly
+  \item Forward  (green) and reverse (red) pass propagate through the \emph{same typed tree}
+  \item<2-> Both passes can be \alert{compiled for this \texttt{Node2\{...\}} type}
+  \item[]<2-> $\Rightarrow$ at runtime, \alert{no type inference} on the tree
   \end{itemize}
 \end{frame}
 
@@ -528,10 +528,9 @@ optimize!(model)
   \begin{codebox}\lstinputlisting{code/10_aot_snippet.jl}\end{codebox}
   \begin{replbox}\lstinputlisting[style=darkrepl]{code/10_aot_build.txt}\end{replbox}
   \smallskip
-  \small
   \begin{itemize}\itemsep1pt
   \item Aggressive typing applies at the \alert{whole \texttt{ExaModel}}, not just the expression tree
-  \item<2-> Possible because the type is \alert{fully inferable at the modeling-function level}: the expression tree is fully known at compile time $\Rightarrow$ kernels for this NLP can be emitted AOT
+  \item<2-> Possible because the type is \alert{fully inferable at the modeling-function level} $\Rightarrow$ kernels for this NLP can be emitted AOT
   \end{itemize}
 \end{frame}
 
@@ -562,11 +561,10 @@ optimize!(model)
   \visible<2->{
     \begin{replbox}\lstinputlisting[style=darkrepl]{code/11_recompile_repl.txt}\end{replbox}
   }
-  \small
   \begin{itemize}\itemsep1pt
   \item<3-> Same algebraic pattern $\Rightarrow$ \alert{cached, instant rebuild}
-  \item<4-> Even a \alert{slight change} (one extra term) $\Rightarrow$ \alert{everything recompiles} ($\sim$99\% compilation time)
-  \item<5-> \alert{Aggressive typing} + \alert{full inlining}: the LLVM IR is one giant block for the typed \texttt{ExaModel}
+  \item<4-> A \alert{slight change} (one extra term) $\Rightarrow$ \alert{everything recompiles} ($\sim$99\% compilation time)
+  \item<5-> \alert{Aggressive typing} + \alert{full inlining}: LLVM IR is one giant block for the typed \texttt{ExaModel}
   \end{itemize}
 \end{frame}
 
@@ -626,11 +624,10 @@ optimize!(model)
     \url{https://github.com/exanauts/ExaModels.jl}
   \end{center}
   \smallskip
-  \small
   \begin{itemize}\itemsep2pt
   \item ExaModels offers a \alert{SIMD abstraction} for NLPs --- pattern + data iterator
-  \item<2-> Encoding the algebraic structure in the type buys us \alert{GPU-native callbacks}, portability across GPU backends, and \alert{AOT compilation} to a standalone binary
-  \item<3-> The trade-off: \alert{all the burden goes onto the compiler} --- great when patterns are stable (specialized, branch-free code), expensive when they change (compile-once per pattern)
+  \item<2-> Encoding the algebraic structure in the type buys us \alert{GPU-native callbacks}, portability, and \alert{AOT compilation}
+  \item<3-> The trade-off: \alert{all the burden goes onto the compiler} --- great when patterns are stable, expensive when they change
   \end{itemize}
   \smallskip
   \visible<4->{
