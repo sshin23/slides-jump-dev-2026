@@ -37,21 +37,10 @@
   morekeywords={function,end,for,if,else,elseif,while,let,do,begin,return,using,import,struct,abstract,mutable,type,const,global,local,where,break,continue,quote,in,true,false,nothing,Inf,NaN},
   morekeywords=[2]{@time,@btime,@elapsed,@allocated,@variable,@constraint,@objective,@NLconstraint,@NLobjective,@add_var,@add_par,@add_obj,@add_con,@add_con!,@add_expr,@register_univariate,@register_bivariate},
   sensitive=true,
-  literate={julia>}{{{\color{omrPrompt}\bfseries julia>}}}{6}
-           {0}{{{\color{omrNumber}0}}}{1}
-           {1}{{{\color{omrNumber}1}}}{1}
-           {2}{{{\color{omrNumber}2}}}{1}
-           {3}{{{\color{omrNumber}3}}}{1}
-           {4}{{{\color{omrNumber}4}}}{1}
-           {5}{{{\color{omrNumber}5}}}{1}
-           {6}{{{\color{omrNumber}6}}}{1}
-           {7}{{{\color{omrNumber}7}}}{1}
-           {8}{{{\color{omrNumber}8}}}{1}
-           {9}{{{\color{omrNumber}9}}}{1}
-           {+}{{{\color{omrOp}+}}}{1}
-           {-}{{{\color{omrOp}-}}}{1}
-           {*}{{{\color{omrOp}*}}}{1}
-           {=}{{{\color{omrOp}=}}}{1},
+  % Only the prompt gets literate-replaced. Numbers and operators are
+  % NOT colored, so output lines (e.g. "170 ms") stay plain text --
+  % matching real OhMyREPL behaviour where output is uncolored.
+  literate={julia>}{{{\color{omrPrompt}\bfseries julia>}}}{6},
 }
 
 \lstdefinestyle{darkrepl}{
@@ -587,13 +576,46 @@ optimize!(model)
 \section{Alternative: ExaModels as a JuMP backend for GPU}
 % =============================================================
 \begin{frame}{Alternative: ExaModels as a JuMP backend for GPU acceleration}{Idea: a small bucket of fully-typed building blocks}
-  \begin{itemize}\itemsep4pt
-  \item Don't ask JuMP to be fully type-stable. Instead, give it a small \alert{bucket of building blocks} that are \alert{fully typed and concrete}
-  \item<2-> $\sim$10 simple shapes of practical significance:
-    \alert{linear}, \alert{quadratic}, \alert{generic polynomial},
-    \alert{polynomial $\times\,\sin$}, \alert{polynomial $\times\,\exp$}, \dots
-  \item<3-> JuMP authors against these blocks; ExaModels executes the conversion \alert{efficiently} over the bucket, with no per-element type inference
-  \item<4-> Makes the JuMP $\to$ ExaModels conversion layer much easier to use --- without forcing JuMP's expression tree to be fully type-stable
+  \begin{itemize}\itemsep2pt
+  \item Don't ask JuMP to be fully type-stable. Give it a small \alert{bucket of building blocks} that are \alert{fully typed and concrete}
+  \item<2-> $\sim$10 patterns of practical significance: \alert{linear}, \alert{quadratic}, \alert{bilinear}, \alert{poly $\times\,\sin$}, \alert{poly $\times\,\exp$}, \dots, plus an \alert{Any fallback} bucket for anything else
+  \end{itemize}
+  \visible<2->{
+    \medskip
+    \begin{center}
+    \begin{tikzpicture}[
+        bucket/.style={
+          draw=mitred, fill=mitred!15, line width=0.5pt,
+          rounded corners=2pt, minimum width=1.5cm, minimum height=0.8cm,
+          align=center, font=\scriptsize
+        },
+        anybucket/.style={
+          draw=mitdarkgray, fill=mitlightgray!30, line width=0.5pt,
+          rounded corners=2pt, minimum width=1.5cm, minimum height=0.8cm,
+          align=center, font=\scriptsize\ttfamily
+        },
+        lbl/.style={font=\tiny, color=mitdarkgray}
+      ]
+      \node[bucket]    (b1) at (0.00, 0) {$ax{+}b$};
+      \node[bucket]    (b2) at (1.75, 0) {$ax^2$};
+      \node[bucket]    (b3) at (3.50, 0) {$xy$};
+      \node[bucket]    (b4) at (5.25, 0) {$p(x)\sin x$};
+      \node[bucket]    (b5) at (7.00, 0) {$p(x)\,e^x$};
+      \node[anybucket] (b6) at (9.40, 0) {\texttt{Any}};
+      \node[lbl] at ([yshift=-9pt]b1.south) {linear};
+      \node[lbl] at ([yshift=-9pt]b2.south) {quadratic};
+      \node[lbl] at ([yshift=-9pt]b3.south) {bilinear};
+      \node[lbl] at ([yshift=-9pt]b4.south) {poly $\times\,\sin$};
+      \node[lbl] at ([yshift=-9pt]b5.south) {poly $\times\,\exp$};
+      \node[lbl] at ([yshift=-9pt]b6.south) {fallback};
+      \node[font=\scriptsize\itshape, color=mitdarkgray, anchor=west]
+        at (10.45, 0) {\dots};
+    \end{tikzpicture}
+    \end{center}
+    \smallskip
+  }
+  \begin{itemize}\itemsep2pt
+  \item<3-> JuMP authors against these blocks; ExaModels \alert{dispatches statically} on the common patterns and falls back to per-element type inference only for the \texttt{Any} bucket
   \end{itemize}
 \end{frame}
 
