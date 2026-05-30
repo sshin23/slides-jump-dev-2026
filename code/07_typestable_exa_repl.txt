@@ -1,5 +1,18 @@
+julia> ExaModels.fulltype_display!(true);
+
 julia> typeof(em.objs[1].f.f)
-Node2{+,
-  Node2{*, Constant{100},
-    Node1{abs2, Node2{-, ...}}},
-  Node1{abs2, Node2{-, ...}}}
+Node2{typeof(+),
+ Node2{typeof(*), Int64,
+  Node1{typeof(abs2),
+   Node2{typeof(-),
+    Node1{typeof(abs2),
+     Var{Node2{typeof(+),
+      Node2{typeof(-), DataSource, Int64},
+      Int64}}},
+    Var{Node2{typeof(+), DataSource, Int64}}}}},
+ Node1{typeof(abs2),
+  Node2{typeof(-),
+   Var{Node2{typeof(+),
+    Node2{typeof(-), DataSource, Int64},
+    Int64}},
+   Int64}}}
