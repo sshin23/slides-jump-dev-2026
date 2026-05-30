@@ -568,10 +568,11 @@ optimize!(model)
   \visible<2->{
     \begin{replbox}\lstinputlisting[style=darkrepl]{code/11_recompile_repl.txt}\end{replbox}
   }
-  \normalsize
+  \small
   \begin{itemize}\itemsep1pt
   \item<3-> Same algebraic pattern $\Rightarrow$ \alert{cached, instant rebuild}
-  \item<4-> Even a \alert{slight change} in the model (one extra term) $\Rightarrow$ \alert{essentially the whole thing recompiles} --- $\sim$99\% compilation time on both cold builds
+  \item<4-> Even a \alert{slight change} (one extra term) $\Rightarrow$ \alert{essentially everything recompiles} ($\sim$99\% compilation time)
+  \item<5-> \alert{Aggressive typing} + \alert{full inlining}: the LLVM IR is one giant block for the typed \texttt{ExaModel}
   \end{itemize}
 \end{frame}
 
