@@ -1,6 +1,7 @@
 \documentclass[aspectratio=169,11pt]{beamer}
 \usepackage[dvipsnames]{xcolor}
 \usepackage{tikz}
+\usetikzlibrary{shapes.geometric}
 \usepackage{mathtools}
 \usepackage{multirow}
 \usepackage{booktabs}
@@ -366,15 +367,55 @@
 \section{Where the gap comes from}
 % =============================================================
 \begin{frame}[fragile]{Where the gap comes from: JuMP unrolls into a type-erased array}
-  \scriptsize
-  \begin{codebox}\lstinputlisting{code/07_typestable_jump.jl}\end{codebox}
-  \begin{replbox}\lstinputlisting[style=darkrepl]{code/07_typestable_jump_repl.txt}\end{replbox}
-  \medskip
-  \normalsize
+  \begin{columns}[T]
+    \begin{column}{.50\textwidth}
+      \scriptsize
+      \begin{codebox}\lstinputlisting{code/07_typestable_jump.jl}\end{codebox}
+      \begin{replbox}\lstinputlisting[style=darkrepl]{code/07_typestable_jump_repl.txt}\end{replbox}
+    \end{column}
+    \begin{column}{.48\textwidth}
+      \centering
+      \begin{tikzpicture}[every node/.style={font=\scriptsize, align=center},
+                         baseline={(0,2.7)}]
+        \useasboundingbox (-2.6, -2.3) rectangle (2.6, 2.7);
+        % --- Top: Vector{Any} bucket with unknown "clouds" inside ---
+        \node[font=\scriptsize\ttfamily, anchor=south] at (0, 2.2) {\texttt{f.args :: Vector\{Any\}}};
+        \draw[thick, fill=mitlightgray!25, rounded corners=4pt]
+          (-2.1, 0.7) rectangle (2.1, 2.1);
+        \foreach \x/\y in {-1.4/1.65, -0.5/1.75, 0.5/1.55, 1.4/1.7,
+                           -1.0/1.15, 0.0/1.25, 1.0/1.05} {
+          \draw[fill=white, draw=mitdarkgray, line width=0.3pt]
+            plot[smooth cycle] coordinates
+              {(\x-0.18, \y) (\x-0.10, \y+0.13) (\x+0.10, \y+0.13)
+               (\x+0.18, \y) (\x+0.10, \y-0.13) (\x-0.10, \y-0.13)};
+        }
+        \node[font=\tiny\itshape, color=mitdarkgray] at (0, 0.4) {clouds = unknown types};
+        % --- Arrow with label ---
+        \draw[->, very thick, mitred] (0, 0.15) -- (0, -0.85);
+        \node[anchor=west, font=\tiny, color=mitred] at (0.15, -0.35)
+          {classify\\(type inference\\per node)};
+        % --- Bottom: classified shapes ---
+        \node[draw=mitred, fill=mitred!15, circle,
+              minimum size=0.55cm, inner sep=0pt] (s1) at (-1.7, -1.4) {};
+        \node[draw=mitred, fill=mitred!15, regular polygon, regular polygon sides=3,
+              minimum size=0.65cm, inner sep=0pt] (s2) at (-0.6, -1.4) {};
+        \node[draw=mitred, fill=mitred!15, rectangle,
+              minimum size=0.50cm, inner sep=0pt] (s3) at (0.5, -1.4) {};
+        \node[draw=mitred, fill=mitred!15, regular polygon, regular polygon sides=6,
+              minimum size=0.60cm, inner sep=0pt] (s4) at (1.55, -1.4) {};
+        \node[font=\tiny] at (s1.south) [yshift=-6pt] {$x^2$};
+        \node[font=\tiny] at (s2.south) [yshift=-6pt] {$\sin x$};
+        \node[font=\tiny] at (s3.south) [yshift=-6pt] {$\exp x$};
+        \node[font=\tiny] at (s4.south) [yshift=-6pt] {$\cdots$};
+      \end{tikzpicture}
+    \end{column}
+  \end{columns}
+  \smallskip
+  \small
   \begin{itemize}\itemsep1pt
-  \item JuMP \alert{unrolls the expression at construction} into a flat array of operators / operands
-  \item<2-> The array is \texttt{Vector\{Any\}} --- the algebraic structure lives only in the \alert{runtime element types}, not in the array's static type
-  \item<3-> Every conversion to ExaModels walks each node and pays \alert{type inference} per element $\Rightarrow$ that cost dominates the JuMP $\to$ ExaModels build
+  \item JuMP \alert{unrolls the expression at construction} into a flat \texttt{Vector\{Any\}} --- structure lives only in the runtime element types
+  \item<2-> The ExaModels--JuMP extension walks every node, \alert{infers its type}, and classifies it into an operator pattern ($x^2$, $\sin x$, $\exp x$, $\dots$) --- \alert{this per-node type inference dominates the cost}
+  \item<3-> The tree representation is fine; what we need is a \alert{type-inferable} tree so iteration is cheap
   \end{itemize}
 \end{frame}
 
