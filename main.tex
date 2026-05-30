@@ -533,11 +533,10 @@ optimize!(model)
   \begin{codebox}\lstinputlisting{code/10_aot_snippet.jl}\end{codebox}
   \begin{replbox}\lstinputlisting[style=darkrepl]{code/10_aot_build.txt}\end{replbox}
   \smallskip
-  \footnotesize
+  \small
   \begin{itemize}\itemsep1pt
-  \item \texttt{juliac --trim=safe} compiles it \alert{without the Julia runtime} --- like a C shared library or executable
+  \item Aggressive typing applies at the \alert{whole \texttt{ExaModel}}, not just the expression tree
   \item<2-> Possible because the type is \alert{fully inferable at the modeling-function level}: the expression tree is fully known at compile time $\Rightarrow$ kernels for this NLP can be emitted AOT
-  \item<3-> Aggressive typing applies at the \alert{whole \texttt{ExaModel}}, not just the expression tree --- variables, constraints, data sources, AD callbacks all type-stable
   \end{itemize}
 \end{frame}
 

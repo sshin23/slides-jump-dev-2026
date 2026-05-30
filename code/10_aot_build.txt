@@ -1,3 +1,3 @@
-$ juliac --trim=safe -o rosenbrock MySolve.jl
+$ juliac --trim=safe -o rosenbrock MySolve.jl   # compile to a standalone executable
 $ ./rosenbrock
 status = first_order
