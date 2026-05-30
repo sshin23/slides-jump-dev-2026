@@ -5,6 +5,8 @@
 \usepackage{multirow}
 \usepackage{booktabs}
 \usepackage{listings}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins,listings,breakable}
 
 \lstdefinelanguage{julia}{
   morekeywords={using,end,function,return,for,in,if,else,elseif,while,let,do,begin,struct,abstract,mutable,type,const,global,local,where,break,continue,quote,true,false,nothing,Inf},
@@ -18,17 +20,14 @@
 
 \lstdefinestyle{darkrepl}{
   language={},
-  basicstyle=\ttfamily\color{white}\tiny,
-  backgroundcolor=\color{black},
-  frame=single,
-  frameround=tttt,
-  framerule=0.4pt,
-  rulecolor=\color{black},
-  framesep=4pt,
-  xleftmargin=4pt,
-  xrightmargin=4pt,
-  aboveskip=4pt,
-  belowskip=4pt,
+  basicstyle=\ttfamily\color{white}\scriptsize,
+  backgroundcolor=,
+  frame=none,
+  framesep=0pt,
+  xleftmargin=0pt,
+  xrightmargin=0pt,
+  aboveskip=0pt,
+  belowskip=0pt,
 }
 \lstset{
   language=julia,
@@ -43,16 +42,31 @@
   keepspaces=true,
   breaklines=false,
   upquote=true,
-  backgroundcolor=\color{mitlightgray!30},
-  frame=single,
-  frameround=tttt,
-  framerule=0.4pt,
-  rulecolor=\color{mitlightgray!50},
-  framesep=4pt,
-  xleftmargin=4pt,
-  xrightmargin=4pt,
-  aboveskip=4pt,
-  belowskip=4pt,
+  backgroundcolor=,
+  frame=none,
+  framesep=0pt,
+  xleftmargin=0pt,
+  xrightmargin=0pt,
+  aboveskip=0pt,
+  belowskip=0pt,
+}
+
+% Rounded code-block wrappers (true rounded corners via tcolorbox)
+\newtcolorbox{codebox}[1][]{%
+  enhanced,
+  colback=mitlightgray!30, colframe=mitlightgray!30,
+  arc=2mm, outer arc=2mm, boxrule=0pt,
+  boxsep=0pt, left=4pt, right=4pt, top=3pt, bottom=3pt,
+  before skip=4pt, after skip=4pt,
+  #1,
+}
+\newtcolorbox{replbox}[1][]{%
+  enhanced,
+  colback=black, colframe=black,
+  arc=2mm, outer arc=2mm, boxrule=0pt,
+  boxsep=0pt, left=4pt, right=4pt, top=3pt, bottom=3pt,
+  before skip=4pt, after skip=4pt,
+  #1,
 }
 \usepackage[style=authoryear-comp,url=false,date=year,doi=false,isbn=false,eprint=true,maxnames=1,minnames=1,backend=biber,natbib=true]{biblatex}
 
@@ -233,7 +247,7 @@
     \begin{column}{.52\textwidth}
       \vspace{-1em}
       {\scriptsize\itshape Example: Goddard rocket --- maximize final altitude.\par}
-      \lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{6pt}\selectfont]{code/03_what_is_snippet.jl}
+      \begin{codebox}\lstinputlisting[basicstyle=\ttfamily\fontsize{6pt}{6pt}\selectfont]{code/03_what_is_snippet.jl}\end{codebox}
     \end{column}
   \end{columns}
 \end{frame}
@@ -317,7 +331,7 @@
 % =============================================================
 \begin{frame}[fragile]{The ExaModels JuMP Interface: Status Quo}
   \scriptsize
-  \lstinputlisting{code/05_interface_snippet.jl}
+  \begin{codebox}\lstinputlisting{code/05_interface_snippet.jl}\end{codebox}
   \medskip
   \normalsize
   \begin{itemize}
@@ -325,28 +339,26 @@
   \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{Model-build cost: JuMP route vs native ExaModels}
+\begin{frame}[fragile]{The cost is the JuMP $\to$ ExaModels conversion layer}
   \scriptsize
   \begin{columns}[T]
     \begin{column}{.49\textwidth}
       \alert{\bfseries JuMP route}
-      \lstinputlisting{code/06_build_via_jump_snippet.jl}
-      \smallskip
-      \lstinputlisting[language={}, basicstyle=\ttfamily\scriptsize, backgroundcolor=\color{white}, frame=none, xleftmargin=0pt, xrightmargin=0pt, aboveskip=0pt, belowskip=0pt]{code/06_timing_jump.txt}
+      \begin{codebox}\lstinputlisting{code/06_build_via_jump_snippet.jl}\end{codebox}
+      \begin{replbox}\lstinputlisting[style=darkrepl]{code/06_timing_jump.txt}\end{replbox}
     \end{column}
     \begin{column}{.49\textwidth}
       \alert{\bfseries Native ExaModels}
-      \lstinputlisting{code/06_build_native_snippet.jl}
-      \smallskip
-      \lstinputlisting[language={}, basicstyle=\ttfamily\scriptsize, backgroundcolor=\color{white}, frame=none, xleftmargin=0pt, xrightmargin=0pt, aboveskip=0pt, belowskip=0pt]{code/06_timing_native.txt}
+      \begin{codebox}\lstinputlisting{code/06_build_native_snippet.jl}\end{codebox}
+      \begin{replbox}\lstinputlisting[style=darkrepl]{code/06_timing_native.txt}\end{replbox}
     \end{column}
   \end{columns}
   \medskip
   \normalsize
   \begin{itemize}\itemsep1pt
-  \item $\sim$\,\alert{7\,200$\times$ faster} build, $\sim$\,\alert{350$\times$ less memory}, $\sim$\,\alert{360{,}000$\times$ fewer allocations}
-  \item<2-> The gap \alert{grows with $N$}
-  \item<3-> ExaModels itself is faster than JuMP, but \alert{most of the overhead is in the JuMP $\to$ ExaModels conversion layer} (next slide)
+  \item ExaModels itself is faster than JuMP, but \alert{most of the overhead is in the JuMP $\to$ ExaModels conversion layer} (next slide)
+  \item<2-> $\sim$\,\alert{7\,200$\times$ faster} build, $\sim$\,\alert{350$\times$ less memory}, $\sim$\,\alert{360{,}000$\times$ fewer allocations}
+  \item<3-> The gap \alert{grows with $N$}
   \end{itemize}
 \end{frame}
 
@@ -355,8 +367,8 @@
 % =============================================================
 \begin{frame}[fragile]{Where the gap comes from: JuMP unrolls into a type-erased array}
   \scriptsize
-  \lstinputlisting{code/07_typestable_jump.jl}
-  \lstinputlisting[style=darkrepl]{code/07_typestable_jump_repl.txt}
+  \begin{codebox}\lstinputlisting{code/07_typestable_jump.jl}\end{codebox}
+  \begin{replbox}\lstinputlisting[style=darkrepl]{code/07_typestable_jump_repl.txt}\end{replbox}
   \medskip
   \normalsize
   \begin{itemize}\itemsep1pt
@@ -377,6 +389,7 @@
         {\color{mitdarkgray}\texttt{@blegat}}
       \end{tabular}};
   \end{tikzpicture}%
+\begin{codebox}
 \begin{lstlisting}
 using GenOpt, JuMP, CUDA, MadNLP
 
@@ -389,6 +402,7 @@ using GenOpt, JuMP, CUDA, MadNLP
 set_optimizer(model, () -> GenOpt.ExaOptimizer(madnlp, CUDABackend()))
 optimize!(model)
 \end{lstlisting}
+\end{codebox}
   \begin{itemize}
   \item Intercept JuMP's expression at construction time and route it to the ExaModels backend --- patterns survive intact, no scalar enumeration in the bridge.
   \item<2-> Minimal model rewrite: \texttt{container = ParametrizedArray} on \texttt{@constraint}, \texttt{lazy\_sum} on \texttt{@objective}
@@ -406,8 +420,8 @@ optimize!(model)
   \begin{columns}[T]
     \begin{column}{.55\textwidth}
       \scriptsize
-      \lstinputlisting{code/07_typestable_exa.jl}
-      \lstinputlisting[style=darkrepl, belowskip=0pt]{code/07_typestable_exa_repl.txt}
+      \begin{codebox}\lstinputlisting{code/07_typestable_exa.jl}\end{codebox}
+      \begin{replbox}\lstinputlisting[style=darkrepl]{code/07_typestable_exa_repl.txt}\end{replbox}
     \end{column}
     \begin{column}{.43\textwidth}
       \centering
@@ -425,8 +439,8 @@ optimize!(model)
   \begin{columns}[T]
     \begin{column}{.55\textwidth}
       \scriptsize
-      \lstinputlisting{code/07_typestable_exa.jl}
-      \lstinputlisting[style=darkrepl, belowskip=0pt]{code/07_typestable_exa_repl.txt}
+      \begin{codebox}\lstinputlisting{code/07_typestable_exa.jl}\end{codebox}
+      \begin{replbox}\lstinputlisting[style=darkrepl]{code/07_typestable_exa_repl.txt}\end{replbox}
     \end{column}
     \begin{column}{.43\textwidth}
       \centering
@@ -444,8 +458,8 @@ optimize!(model)
 % =============================================================
 \begin{frame}[fragile]{Because the type knows everything: AOT compile to a standalone binary}
   \scriptsize
-  \lstinputlisting{code/10_aot_snippet.jl}
-  \lstinputlisting[style=darkrepl]{code/10_aot_build.txt}
+  \begin{codebox}\lstinputlisting{code/10_aot_snippet.jl}\end{codebox}
+  \begin{replbox}\lstinputlisting[style=darkrepl]{code/10_aot_build.txt}\end{replbox}
   \smallskip
   \small
   \begin{itemize}\itemsep1pt
@@ -474,16 +488,16 @@ optimize!(model)
   \begin{columns}[T]
     \begin{column}{.49\textwidth}
       \alert{\bfseries v1}
-      \lstinputlisting{code/11_build_v1.jl}
+      \begin{codebox}\lstinputlisting{code/11_build_v1.jl}\end{codebox}
     \end{column}
     \begin{column}{.49\textwidth}
       \alert{\bfseries v2 (added \texttt{sin(x[i])})}
-      \lstinputlisting[moredelim={**[is][\color{mitred}\bfseries]{|}{|}}]{code/11_build_v2.jl}
+      \begin{codebox}\lstinputlisting[moredelim={**[is][\color{mitred}\bfseries]{|}{|}}]{code/11_build_v2.jl}\end{codebox}
     \end{column}
   \end{columns}
   \visible<2->{
   \medskip
-  \lstinputlisting[style=darkrepl, basicstyle=\ttfamily\color{white}\scriptsize]{code/11_recompile_repl.txt}
+  \begin{replbox}\lstinputlisting[style=darkrepl]{code/11_recompile_repl.txt}\end{replbox}
   \scriptsize Identical re-builds hit the cache; the structural change in \texttt{v2} forces a fresh compile.
   }
 \end{frame}

@@ -1,5 +1,5 @@
 julia> typeof(em.objs[1].f.f)
 Node2{+,
   Node2{*, Constant{100},
-    Node1{abs2, Node2{-, Node1{abs2, Var{...}}, Var{...}}}},
-  Node1{abs2, Node2{-, Var{...}, Constant{1}}}}
+    Node1{abs2, Node2{-, ...}}},
+  Node1{abs2, Node2{-, ...}}}
