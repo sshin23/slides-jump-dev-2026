@@ -294,8 +294,6 @@
       \only<1>{%
         \begin{itemize}
         \item Canonical forms ($A, b, c$, ...) $\Rightarrow$ \alert{one-shot CPU$\to$GPU copy} of problem data
-        \item Solver \alert{can iterate entirely on the device}
-        \item Solution copied \alert{once back} to CPU
         \item Transfers can be an overhead, but the cost is \alert{amortized} over many solver iterations
         \item \alert{Existing GPU-native solvers} in this class already work this way: \texttt{CuClarabel}, \texttt{cuPDLP+}
         \item[] $\Rightarrow$ For LP / QP / DCP, a \alert{GPU-native modeling language may not add much value}
@@ -446,7 +444,6 @@
   \begin{itemize}\itemsep1pt
   \item JuMP stores the objective as an \alert{enumerated array of expression trees} in a flat \texttt{Vector\{Any\}} --- element types are erased, so static type inference can't see what's inside
   \item<2-> The ExaModels--JuMP extension walks every node, \alert{infers its type}, and classifies it into an operator pattern ($x^2$, $\sin x$, $\exp x$, $\dots$) --- \alert{this per-node type inference dominates the cost}
-  \item<3-> The tree representation is fine; what we need is a \alert{type-inferable} tree so iteration is cheap
   \end{itemize}
 \end{frame}
 
@@ -570,7 +567,7 @@ optimize!(model)
   \small
   \begin{itemize}\itemsep1pt
   \item<3-> Same algebraic pattern $\Rightarrow$ \alert{cached, instant rebuild}
-  \item<4-> Even a \alert{slight change} (one extra term) $\Rightarrow$ \alert{essentially everything recompiles} ($\sim$99\% compilation time)
+  \item<4-> Even a \alert{slight change} (one extra term) $\Rightarrow$ \alert{everything recompiles} ($\sim$99\% compilation time)
   \item<5-> \alert{Aggressive typing} + \alert{full inlining}: the LLVM IR is one giant block for the typed \texttt{ExaModel}
   \end{itemize}
 \end{frame}
