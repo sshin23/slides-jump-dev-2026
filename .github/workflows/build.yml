@@ -80,3 +80,17 @@ jobs:
         with:
           name: main-pdf
           path: main.pdf
+
+      - name: Publish rolling release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: rolling
+          name: "Slides for JuMP-dev 2026 (rolling release)"
+          body: |
+            Auto-built from `master` (`${{ github.sha }}`).
+            Also live at <https://sshin23.github.io/slides-jump-dev-2026/main.pdf>.
+          artifacts: "main.pdf"
+          allowUpdates: true
+          removeArtifacts: true
+          makeLatest: true
+          token: ${{ secrets.GITHUB_TOKEN }}

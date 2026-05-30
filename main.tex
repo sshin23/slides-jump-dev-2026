@@ -503,7 +503,7 @@ optimize!(model)
   \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{ExaModels: AD passes through the same typed tree}
+\begin{frame}[fragile]{ExaModels: the type \emph{is} the tree}
   \begin{columns}[T]
     \begin{column}{.55\textwidth}
       \tiny
@@ -525,7 +525,7 @@ optimize!(model)
 % =============================================================
 \section{AOT compile: standalone binary}
 % =============================================================
-\begin{frame}[fragile]{Because the type knows everything: AOT compile to a standalone binary}
+\begin{frame}[fragile]{Blessing: AOT compile to a standalone binary}
   \begin{scriptsize}
     \begin{codebox}\lstinputlisting{code/10_aot_snippet.jl}\end{codebox}
     \begin{replbox}\lstinputlisting[style=darkrepl]{code/10_aot_build.txt}\end{replbox}
@@ -540,7 +540,7 @@ optimize!(model)
 % =============================================================
 \section{Portability and performance}
 % =============================================================
-\begin{frame}{Portability and performance}{AD-callback speedup vs CPU-1T baseline, AC OPF (PGLIB-OPF)}
+\begin{frame}{Blessing: Portability and performance}{AD-callback speedup vs CPU-1T baseline, AC OPF (PGLIB-OPF)}
   \centering
   \includegraphics[width=.95\textwidth]{exa_backend_scaling.pdf}
   \begin{itemize}\itemsep1pt
@@ -551,7 +551,7 @@ optimize!(model)
   \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{Trade-off: compile-once per algebraic pattern}
+\begin{frame}[fragile]{Curse: compile-once per algebraic pattern}
   \begin{scriptsize}
     \begin{columns}[T]
       \begin{column}{.49\textwidth}
@@ -625,7 +625,8 @@ optimize!(model)
 % =============================================================
 \begin{frame}{Summary}
   \begin{center}
-    \url{https://github.com/exanauts/ExaModels.jl}
+    \url{https://github.com/exanauts/ExaModels.jl}\\[2pt]
+    {\small Slides: \url{https://sshin23.github.io/slides-jump-dev-2026/main.pdf}}
   \end{center}
   \smallskip
   \begin{itemize}\itemsep2pt
