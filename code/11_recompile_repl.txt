@@ -4,5 +4,5 @@ julia> @time em = build_v1(1000);   # 1st call: fresh pattern compile
 julia> @time em = build_v1(1000);   # 2nd call: pattern cached, no recompile
   33 us
 
-julia> @time em = build_v2(1000);   # different pattern: fresh compile
-  175 ms
+julia> @time em = build_v2(1000);   # different pattern (extra sin term): fresh compile
+  205 ms

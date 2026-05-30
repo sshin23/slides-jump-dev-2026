@@ -420,9 +420,9 @@
 \end{frame}
 
 % =============================================================
-\section{One remedy: hijack JuMP syntax (GenOpt.jl)}
+\section{One remedy: piggyback on JuMP (GenOpt.jl)}
 % =============================================================
-\begin{frame}[fragile]{One remedy: hijack the JuMP syntax (\texttt{GenOpt.jl} \citep{legatGenOptJl2025})}
+\begin{frame}[fragile]{One remedy: piggyback on JuMP (\texttt{GenOpt.jl} \citep{legatGenOptJl2025})}
   \begin{tikzpicture}[remember picture, overlay]
     \node[anchor=north east, xshift=-0.15cm, yshift=-0.15cm] at (current page.north east) {%
       \begin{tabular}{c}\scriptsize
@@ -445,7 +445,7 @@ optimize!(model)
 \end{lstlisting}
 \end{codebox}
   \begin{itemize}
-  \item Intercept JuMP's expression at construction time and route it to the ExaModels backend --- patterns survive intact, no scalar enumeration in the bridge.
+  \item Uses JuMP's own \alert{extension hooks} (a \texttt{ParametrizedArray} container, \texttt{lazy\_sum} generator) so the algebraic patterns \alert{never get unrolled} --- ExaModels sees the structured representation directly
   \item<2-> Minimal model rewrite: \texttt{container = ParametrizedArray} on \texttt{@constraint}, \texttt{lazy\_sum} on \texttt{@objective}
   \item<3-> A really cool proof-of-concept route --- I'm thinking about something else next.
   \end{itemize}
@@ -540,7 +540,7 @@ optimize!(model)
   \visible<2->{
   \medskip
   \begin{replbox}\lstinputlisting[style=darkrepl]{code/11_recompile_repl.txt}\end{replbox}
-  \scriptsize Same pattern $\Rightarrow$ cached. Different pattern $\Rightarrow$ fresh compile of \alert{similar cost} ($v1$ cold $\approx v2$ cold).
+  \scriptsize Same pattern $\Rightarrow$ cached. Different pattern $\Rightarrow$ fresh compile of \alert{similar cost} ($v2$ slightly longer --- one extra term in the tree).
   }
 \end{frame}
 
@@ -565,20 +565,24 @@ optimize!(model)
   \begin{center}
     \url{https://github.com/exanauts/ExaModels.jl}
   \end{center}
-  \vspace{1em}
-  \begin{itemize}
-  \item ExaModels offers a \alert{SIMD abstraction} for NLPs---an alternative to vectorization that preserves indexed structure through (pattern, data iterator) pairs
+  \smallskip
+  \small
+  \begin{itemize}\itemsep1pt
+  \item ExaModels offers a \alert{SIMD abstraction} for NLPs --- pattern + data iterator
   \item<2-> Type-stable parameterized expression tree + coloring-free sparse AD make \alert{GPU-native} derivative evaluation practical
   \item<3-> One model, six KA.jl backends, no code change
-  \item<4-> Already the modeling layer for MadNLP's GPU-native interior-point methods
+  \item<4-> Already the modeling layer for MadNLP's GPU-native IPMs
   \end{itemize}
-  \refbr{\fullcite{pacaudCondensedspaceMethodsNonlinear2024}}
-  \medskip
+  \smallskip
   \visible<5->{
-    \begin{block}{Discussion --- and continuing this thread}
-      \small We don't need to move all of JuMP onto the GPU. The win is \alert{GPU-native callbacks} eliminating the per-iteration round-trip. GenOpt.jl is a proof-of-concept; a slightly more type-stable JuMP expression tree (previous slide) would make the bridge cheap.\\[2pt]
-      Continuing at \alert{SIAM Optimization 2026}: ``The State of ExaModels'' (MS369), \alert{Fri June 5, 11:10 BST}, 50 George Square G.03.
+    \begin{block}{Discussion}
+      \scriptsize We don't need to move all of JuMP onto the GPU. The win is \alert{GPU-native callbacks} eliminating the per-iteration round-trip. A slightly more type-stable JuMP tree would make the bridge cheap.
     \end{block}
+  }
+  \visible<6->{
+    \begin{exampleblock}{Continuing this thread at SIAM Optimization 2026}
+      \scriptsize ``The State of ExaModels'' --- MS369, \alert{Fri June 5, 11:10 BST}.
+    \end{exampleblock}
   }
 \end{frame}
 
