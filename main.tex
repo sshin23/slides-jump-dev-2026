@@ -241,87 +241,75 @@
 % =============================================================
 \section{Why GPU-native modeling, only for NLPs?}
 % =============================================================
-\begin{frame}{Why a GPU-compatible modeling language?}{LP / QP / DCP --- not strictly needed}
+\begin{frame}{Why a GPU-compatible modeling language?}
+  \framesubtitle{%
+    \only<1>{LP / QP / DCP --- not strictly needed}%
+    \only<2->{NLP --- the picture is different}%
+  }
   \begin{columns}[T]
-    \begin{column}{.58\textwidth}
-      \begin{itemize}
-      \item Canonical forms ($A, b, c$, ...) $\Rightarrow$ \alert{one-shot CPU$\to$GPU copy} of problem data
-      \item Solver \alert{can iterate entirely on the device}
-      \item Solution copied \alert{once back} to CPU
-      \item Transfers can be an overhead, but the cost is \alert{amortized} over many solver iterations
-      \item \alert{Existing GPU-native solvers} in this class already work this way: \texttt{CuClarabel}, \texttt{cuPDLP+}
-      \item[]<2-> $\Rightarrow$ For LP / QP / DCP, a \alert{GPU-native modeling language may not add much value}
-      \end{itemize}
+    \begin{column}{.55\textwidth}
+      \only<1>{%
+        \begin{itemize}
+        \item Canonical forms ($A, b, c$, ...) $\Rightarrow$ \alert{one-shot CPU$\to$GPU copy} of problem data
+        \item Solver \alert{can iterate entirely on the device}
+        \item Solution copied \alert{once back} to CPU
+        \item Transfers can be an overhead, but the cost is \alert{amortized} over many solver iterations
+        \item \alert{Existing GPU-native solvers} in this class already work this way: \texttt{CuClarabel}, \texttt{cuPDLP+}
+        \item[] $\Rightarrow$ For LP / QP / DCP, a \alert{GPU-native modeling language may not add much value}
+        \end{itemize}
+      }%
+      \only<2->{%
+        \begin{itemize}\itemsep2pt
+        \item Solver \alert{queries the modeling layer at every iteration} via \alert{callbacks} ---
+          $f(x),\; g(x),\; \nabla_{x} f(x),\; \nabla_{x} g(x),\; \nabla^2_{xx} L(x,\lambda)$
+        \item Each query depends on the current iterate --- \alert{no one-shot transfer}
+        \item Without GPU-native callbacks, every iteration pays a CPU$\leftrightarrow$GPU round-trip: \alert{significant per-iteration overhead, no amortization}
+        \item<3-> JuMP today does \alert{not} emit GPU-native callbacks. Fine: modeling infrastructure stays on CPU, \alert{as long as the callbacks themselves run on the device}
+        \end{itemize}
+      }%
     \end{column}
-    \begin{column}{.40\textwidth}
+    \begin{column}{.43\textwidth}
       \centering
       \begin{tikzpicture}[every node/.style={font=\scriptsize, align=center},
-                         baseline={(0,4.20)}]
-        % Fixed bounding box --- identical across LP/QP and NLP slides
-        \useasboundingbox (-2.2, -1.20) rectangle (2.2, 4.20);
-        % --- Static elements (identical on the NLP slide) ---
-        \node[anchor=south, inner sep=0] (cpu) at (0, 2.6)
-          {\includegraphics[width=2.0cm]{cpu_sungho.jpg}};
-        \node[font=\bfseries, color=mitdarkgray] at (0, 3.92) {CPU};
+                         baseline={(0,4.45)}]
+        % Fixed bounding box --- guarantees the cartoon does not move between overlays
+        \useasboundingbox (-2.5, -1.35) rectangle (2.5, 4.45);
+        % --- STATIC elements (drawn on every overlay, never reshuffled) ---
+        \node[anchor=south, inner sep=0] (cpu) at (0, 2.7)
+          {\includegraphics[width=2.4cm]{cpu_sungho.jpg}};
+        \node[font=\bfseries, color=mitdarkgray] at (0, 4.20) {CPU};
         \node[anchor=north, inner sep=0] (gpu) at (0, 0.4)
-          {\includegraphics[width=2.0cm]{exa_a100_gpu.png}};
-        \node[font=\bfseries, color=mitred] at (0, -1.00) {GPU};
+          {\includegraphics[width=2.4cm]{exa_a100_gpu.png}};
+        \node[font=\bfseries, color=mitred] at (0, -1.15) {GPU};
         \filldraw[fill=mitorange!25, draw=mitorange, line width=0.6pt, rounded corners=2pt]
-          (-1.7, 1.30) rectangle (1.7, 1.70);
+          (-2.05, 1.25) rectangle (2.05, 1.75);
         \node[font=\scriptsize\bfseries, color=mitorange!60!black] at (0, 1.50) {PCIe / SXM bus};
-        % --- Arrows + labels (only this part differs from the NLP slide) ---
-        \draw[->, very thick, mitred] (-0.55, 2.55) -- (-0.55, 0.45);
-        \draw[->, very thick, mitred] (0.55, 0.45) -- (0.55, 2.55);
-        \node[font=\tiny, color=mitdarkgray, anchor=east] at (-0.7, 2.15) {problem\\(once)};
-        \node[font=\tiny, color=mitdarkgray, anchor=west] at (0.7, 0.85) {solution\\(once)};
+        % --- DYNAMIC: LP/QP arrows + labels (overlay 1) ---
+        \only<1>{
+          \draw[->, very thick, mitred] (-0.65, 2.65) -- (-0.65, 0.45);
+          \draw[->, very thick, mitred] (0.65, 0.45) -- (0.65, 2.65);
+          \node[font=\tiny, color=mitdarkgray, anchor=east] at (-0.78, 2.20) {problem\\(once)};
+          \node[font=\tiny, color=mitdarkgray, anchor=west] at (0.78, 0.80) {solution\\(once)};
+        }
+        % --- DYNAMIC: NLP arrows + iter labels (overlay 2+) ---
+        \only<2->{
+          \foreach \i in {0,1,2,3,4} {
+            \pgfmathsetmacro{\x}{-1.00 + 0.50*\i}
+            \draw[<->, thick, mitred] (\x, 2.65) -- (\x, 0.45);
+          }
+          \node[font=\scriptsize, color=mitdarkgray, anchor=east] at (-1.30, 2.20) {iter:};
+          \foreach \i in {0,1,2,3,4} {
+            \pgfmathsetmacro{\x}{-1.00 + 0.50*\i}
+            \node[font=\tiny\bfseries, color=mitred, fill=white,
+                  inner sep=1pt, rounded corners=0.5pt] at (\x, 2.20) {\i};
+          }
+          \node[font=\tiny\bfseries, color=mitred, anchor=west, fill=white, inner sep=1pt]
+            at (1.30, 2.20) {$\cdots$};
+        }
       \end{tikzpicture}
     \end{column}
   \end{columns}
-  \refbr{\fullcite{luCuPDLPFurtherEnhanced2025}}
-\end{frame}
-
-\begin{frame}{Why a GPU-compatible modeling language?}{NLP --- the picture is different}
-  \begin{columns}[T]
-    \begin{column}{.58\textwidth}
-      \begin{itemize}\itemsep2pt
-      \item Solver \alert{queries the modeling layer at every iteration} via \alert{callbacks} ---
-        $f(x),\; g(x),\; \nabla f(x),\; \nabla g(x),\; \nabla^2_{xx} L(x,\lambda)$
-      \item Each query depends on the current iterate---\alert{no one-shot transfer}
-      \item Without GPU-native callbacks, every iteration pays a CPU$\leftrightarrow$GPU round-trip: \alert{significant per-iteration overhead, no amortization}
-      \item<2-> JuMP today does \alert{not} emit GPU-native callbacks. Fine: modeling infrastructure stays on CPU, \alert{as long as the callbacks themselves run on the device}
-      \end{itemize}
-    \end{column}
-    \begin{column}{.40\textwidth}
-      \centering
-      \begin{tikzpicture}[every node/.style={font=\scriptsize, align=center},
-                         baseline={(0,4.20)}]
-        % Identical bounding box + static elements as the LP/QP slide
-        \useasboundingbox (-2.2, -1.20) rectangle (2.2, 4.20);
-        \node[anchor=south, inner sep=0] (cpu) at (0, 2.6)
-          {\includegraphics[width=2.0cm]{cpu_sungho.jpg}};
-        \node[font=\bfseries, color=mitdarkgray] at (0, 3.92) {CPU};
-        \node[anchor=north, inner sep=0] (gpu) at (0, 0.4)
-          {\includegraphics[width=2.0cm]{exa_a100_gpu.png}};
-        \node[font=\bfseries, color=mitred] at (0, -1.00) {GPU};
-        \filldraw[fill=mitorange!25, draw=mitorange, line width=0.6pt, rounded corners=2pt]
-          (-1.7, 1.30) rectangle (1.7, 1.70);
-        \node[font=\scriptsize\bfseries, color=mitorange!60!black] at (0, 1.50) {PCIe / SXM bus};
-        % --- Arrows + iter labels (only this part differs from the LP/QP slide) ---
-        \foreach \i in {0,1,2,3,4} {
-          \pgfmathsetmacro{\x}{-0.80 + 0.40*\i}
-          \draw[<->, thick, mitred] (\x, 2.55) -- (\x, 0.45);
-        }
-        \node[font=\scriptsize, color=mitdarkgray, anchor=east] at (-1.05, 2.15) {iter:};
-        \foreach \i in {0,1,2,3,4} {
-          \pgfmathsetmacro{\x}{-0.80 + 0.40*\i}
-          \node[font=\tiny\bfseries, color=mitred, fill=white,
-                inner sep=1pt, rounded corners=0.5pt] at (\x, 2.15) {\i};
-        }
-        \node[font=\tiny\bfseries, color=mitred, anchor=west, fill=white, inner sep=1pt]
-          at (1.05, 2.15) {$\cdots$};
-      \end{tikzpicture}
-    \end{column}
-  \end{columns}
+  \only<1>{\refbr{\fullcite{luCuPDLPFurtherEnhanced2025}}}
 \end{frame}
 
 % =============================================================
