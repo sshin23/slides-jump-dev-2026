@@ -217,8 +217,7 @@
   \url{shin.mit.edu}
 }
 \institute{
-  Massachusetts Institute of Technology\\[2pt]
-  {\small Slides: \url{https://sshin23.github.io/slides-jump-dev-2026/main.pdf}}
+  Massachusetts Institute of Technology
 }
 
 \date{JuMP-dev 2026 \quad\textbar\quad Edinburgh}
@@ -523,6 +522,20 @@ optimize!(model)
 \end{frame}
 
 % =============================================================
+\section{Portability and performance}
+% =============================================================
+\begin{frame}{Blessing: Portability and performance}{AD-callback speedup vs CPU-1T baseline, AC OPF (PGLIB-OPF)}
+  \centering
+  \includegraphics[width=.95\textwidth]{exa_backend_scaling.pdf}
+  \begin{itemize}\itemsep1pt
+  \item Tree complexity \alert{decoupled from the array level}: only \alert{data-level parallelism} is applied; per-data-point ops are scalar Julia, fully type-inferable
+  \item<2-> Same model code runs on \texttt{CPU()}, \texttt{CUDABackend()}, \texttt{ROCBackend()}, \texttt{oneAPIBackend()}, \texttt{MetalBackend()} --- \alert{portable across GPU architectures}
+  \item<3-> Jacobian / Hessian: CUDA, AMDGPU reach \alert{$>100\times$} at $n_{\text{var}} \sim 10^6$; \texttt{oneAPI} fp64 on Arc A770 is emulated $\Rightarrow$ hardware limit, not a software gap
+  \item<4-> More benchmark results presented at \alert{SIAM Optimization 2026} (MS369, Fri June 5)
+  \end{itemize}
+\end{frame}
+
+% =============================================================
 \section{AOT compile: standalone binary}
 % =============================================================
 \begin{frame}[fragile]{Blessing: AOT compile to a standalone binary}
@@ -534,20 +547,6 @@ optimize!(model)
   \begin{itemize}\itemsep1pt
   \item Aggressive typing applies at the \alert{whole \texttt{ExaModel}}, not just the expression tree
   \item<2-> Possible because the type is \alert{fully inferable at the modeling-function level}
-  \end{itemize}
-\end{frame}
-
-% =============================================================
-\section{Portability and performance}
-% =============================================================
-\begin{frame}{Blessing: Portability and performance}{AD-callback speedup vs CPU-1T baseline, AC OPF (PGLIB-OPF)}
-  \centering
-  \includegraphics[width=.95\textwidth]{exa_backend_scaling.pdf}
-  \begin{itemize}\itemsep1pt
-  \item Tree complexity \alert{decoupled from the array level}: only \alert{data-level parallelism} is applied; per-data-point ops are scalar Julia, fully type-inferable
-  \item<2-> Same model code runs on \texttt{CPU()}, \texttt{CUDABackend()}, \texttt{ROCBackend()}, \texttt{oneAPIBackend()}, \texttt{MetalBackend()} --- \alert{portable across GPU architectures}
-  \item<3-> Jacobian / Hessian: CUDA, AMDGPU reach \alert{$>100\times$} at $n_{\text{var}} \sim 10^6$; \texttt{oneAPI} fp64 on Arc A770 is emulated $\Rightarrow$ hardware limit, not a software gap
-  \item<4-> More benchmark results presented at \alert{SIAM Optimization 2026} (MS369, Fri June 5)
   \end{itemize}
 \end{frame}
 
@@ -626,11 +625,11 @@ optimize!(model)
 \begin{frame}{Summary}
   \begin{center}
     \url{https://github.com/exanauts/ExaModels.jl}\\[2pt]
-    {\small Slides: \url{https://sshin23.github.io/slides-jump-dev-2026/main.pdf}}
+    {Slides: \url{https://sshin23.github.io/slides-jump-dev-2026/main.pdf}}
   \end{center}
   \smallskip
   \begin{itemize}\itemsep2pt
-  \item ExaModels offers a \alert{SIMD abstraction} for NLPs --- pattern + data iterator
+  % \item ExaModels offers a \alert{SIMD abstraction} for NLPs --- pattern + data iterator
   \item<2-> Encoding the algebraic structure in the type buys us \alert{GPU-native callbacks}, portability, and \alert{AOT compilation}
   \item<3-> The trade-off: \alert{all the burden goes onto the compiler} --- great when patterns are stable, expensive when they change
   \end{itemize}
