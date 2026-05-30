@@ -1,8 +1,8 @@
 julia> @time em = build_v1(1000);   # v1 first call: fresh pattern compile
   0.088402 seconds (316.07 k allocations: 15.612 MiB, 99.96% compilation time)
 
-julia> @time em = build_v2(1000);   # different pattern: fresh compile
-  0.094173 seconds (354.10 k allocations: 17.438 MiB, 99.95% compilation time)
-
 julia> @time em = build_v1(1000);   # v1 again: pattern cached, no recompile
   0.000027 seconds (75 allocations: 35.250 KiB)
+
+julia> @time em = build_v2(1000);   # different pattern: fresh compile
+  0.094173 seconds (354.10 k allocations: 17.438 MiB, 99.95% compilation time)
