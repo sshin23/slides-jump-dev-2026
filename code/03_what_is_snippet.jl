@@ -5,7 +5,7 @@ T_c, h_c, v_c, m_c = 3.5, 500.0, 620.0, 0.6
 c_e = 0.5*sqrt(g_0*h_0); m_f = m_c*m_0
 D_c = 0.5*v_c*(m_0/g_0); T_max = T_c*m_0*g_0
 
-core = ExaCore(minimize = false, concrete = Val(true))
+core = ExaCore(minimize=false, concrete=Val(true))
 
 @add_var(core, h, 0:nh; start = 1.0, lvar = 1.0)
 @add_var(core, v, 0:nh; start = (i/nh*(1-i/nh) for i=0:nh))

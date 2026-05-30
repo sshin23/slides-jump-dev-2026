@@ -22,4 +22,5 @@ println("\njulia> @time em = build_v1(1000);   # 2nd call: pattern cached, no re
 @time em = build_v1(1000);
 
 println("\njulia> @time em = build_v2(1000);   # different pattern: fresh compile")
-@time em = build_v2(1000);
+@time em = build_v2(1000); 
+ 
