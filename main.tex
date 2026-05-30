@@ -592,19 +592,18 @@ optimize!(model)
   \end{center}
   \smallskip
   \small
-  \begin{itemize}\itemsep1pt
+  \begin{itemize}\itemsep2pt
   \item ExaModels offers a \alert{SIMD abstraction} for NLPs --- pattern + data iterator
-  \item<2-> Type-stable parameterized expression tree + coloring-free sparse AD make \alert{GPU-native} derivative evaluation practical
-  \item<3-> One model, six KA.jl backends, no code change
-  \item<4-> Already the modeling layer for MadNLP's GPU-native IPMs
+  \item<2-> Encoding the algebraic structure in the type buys us \alert{GPU-native callbacks}, portability across GPU backends, and \alert{AOT compilation} to a standalone binary
+  \item<3-> The trade-off: \alert{all the burden goes onto the compiler} --- great when patterns are stable (specialized, branch-free code), expensive when they change (compile-once per pattern)
   \end{itemize}
   \smallskip
-  \visible<5->{
+  \visible<4->{
     \begin{block}{Discussion}
       \scriptsize We don't need to move all of JuMP onto the GPU. The win is \alert{GPU-native callbacks} eliminating the per-iteration round-trip. A slightly more type-stable JuMP tree would make the bridge cheap.
     \end{block}
   }
-  \visible<6->{
+  \visible<5->{
     \begin{exampleblock}{Continuing this thread at SIAM Optimization 2026}
       \scriptsize ``The State of ExaModels'' --- MS369, \alert{Fri June 5, 11:10 BST}.
     \end{exampleblock}
