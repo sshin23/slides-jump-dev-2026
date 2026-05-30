@@ -556,23 +556,23 @@ optimize!(model)
 \end{frame}
 
 \begin{frame}[fragile]{Trade-off: compile-once per algebraic pattern}
-  \scriptsize Each new algebraic pattern triggers a fresh compile. Changing the expression --- even by one term --- counts as a new pattern.
-  \medskip
+  \scriptsize
   \begin{columns}[T]
     \begin{column}{.49\textwidth}
-      \alert{\bfseries v1}
       \begin{codebox}\lstinputlisting{code/11_build_v1.jl}\end{codebox}
     \end{column}
     \begin{column}{.49\textwidth}
-      \alert{\bfseries v2 (added \texttt{sin(x[i])})}
       \begin{codebox}\lstinputlisting[moredelim={**[is][\color{mitred}\bfseries]{|}{|}}]{code/11_build_v2.jl}\end{codebox}
     \end{column}
   \end{columns}
   \visible<2->{
-  \medskip
-  \begin{replbox}\lstinputlisting[style=darkrepl]{code/11_recompile_repl.txt}\end{replbox}
-  \scriptsize Same pattern $\Rightarrow$ cached. Different pattern $\Rightarrow$ fresh compile of \alert{similar cost} ($\sim$99\% compilation time both times; $v2$ slightly longer for the extra term).
+    \begin{replbox}\lstinputlisting[style=darkrepl]{code/11_recompile_repl.txt}\end{replbox}
   }
+  \normalsize
+  \begin{itemize}\itemsep1pt
+  \item<3-> Same algebraic pattern $\Rightarrow$ \alert{cached, instant rebuild}
+  \item<4-> Even a \alert{slight change} in the model (one extra term) $\Rightarrow$ \alert{essentially the whole thing recompiles} --- $\sim$99\% compilation time on both cold builds
+  \end{itemize}
 \end{frame}
 
 % =============================================================
