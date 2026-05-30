@@ -645,13 +645,43 @@ optimize!(model)
   }
 \end{frame}
 
-\AtNextBibliography{\tiny}
-\setbeamertemplate{bibliography item}{}
-\begin{frame}{References}
-  \tikz[text width=1.1\textwidth,xscale=.9,transform shape]{
-    \node at (current page.center) {\printbibliography[heading=none]};
-  }
-\end{frame}
+% --- Re-show the title page as the closing slide ---
+{
+\setbeamertemplate{footline}{}
+\frame{
+  \thispagestyle{empty}
+  \titlepage
+  \begin{tikzpicture}[remember picture, overlay]
+    \node[anchor=south, yshift=0.25cm] at (current page.south) {%
+      \tiny
+      \setlength{\tabcolsep}{2pt}%
+      \begin{tabular}{cccccccccc}
+        \circavatar{shin.jpeg} &
+        \circavatar{michel2323.jpeg} &
+        \circavatar{amontoison.jpeg} &
+        \circavatar{blegat.png} &
+        \circavatar{klamike.png} &
+        \circavatar{frapac.jpeg} &
+        \circavatar{andrewrosemberg.jpeg} &
+        \circavatar{FHoltorf.png} &
+        \circavatar{jbcaillau.jpeg} &
+        \circavatar{hfytr.png} \\
+        S. Shin & M. Schanen & A. Montoison & B. Legat & M. Klamkin &
+        F. Pacaud & A. Rosemberg & F. Holtorf & J.-B. Caillau & Archim J \\
+        {\color{mitdarkgray}\texttt{@sshin23}} &
+        {\color{mitdarkgray}\texttt{@michel2323}} &
+        {\color{mitdarkgray}\texttt{@amontoison}} &
+        {\color{mitdarkgray}\texttt{@blegat}} &
+        {\color{mitdarkgray}\texttt{@klamike}} &
+        {\color{mitdarkgray}\texttt{@frapac}} &
+        {\color{mitdarkgray}\texttt{@andrewrosemberg}} &
+        {\color{mitdarkgray}\texttt{@FHoltorf}} &
+        {\color{mitdarkgray}\texttt{@jbcaillau}} &
+        {\color{mitdarkgray}\texttt{@hfytr}}
+      \end{tabular}};
+  \end{tikzpicture}
+}
+}
 
 \end{document}
 
