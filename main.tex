@@ -520,6 +520,7 @@ optimize!(model)
   \item Tree complexity \alert{decoupled from the array level}: only \alert{data-level parallelism} is applied; per-data-point ops are scalar Julia, fully type-inferable
   \item<2-> Same model code runs on \texttt{CPU()}, \texttt{CUDABackend()}, \texttt{ROCBackend()}, \texttt{oneAPIBackend()}, \texttt{MetalBackend()} --- \alert{portable across GPU architectures}
   \item<3-> Jacobian / Hessian: CUDA, AMDGPU reach \alert{$>100\times$} at $n_{\text{var}} \sim 10^6$; \texttt{oneAPI} fp64 on Arc A770 is emulated $\Rightarrow$ hardware limit, not a software gap
+  \item<4-> More benchmark results presented at \alert{SIAM Optimization 2026} (MS369, Fri June 5)
   \end{itemize}
 \end{frame}
 
