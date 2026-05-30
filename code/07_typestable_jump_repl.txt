@@ -1,5 +1,6 @@
-julia> typeof(f.args)
-Vector{Any}
+julia> moi = backend(jm);
 
-julia> eltype(f.args)
-Any
+julia> obj = moi.model_cache.model.objective;
+
+julia> obj.scalar_nonlinear.args |> typeof
+Vector{Any}
