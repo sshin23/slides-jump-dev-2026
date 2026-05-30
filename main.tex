@@ -408,7 +408,7 @@
                          baseline={(0,2.7)}]
         \useasboundingbox (-2.6, -2.3) rectangle (2.6, 2.7);
         % --- Top: Vector{Any} bucket with unknown "clouds" inside ---
-        \node[font=\scriptsize\ttfamily, anchor=south] at (0, 2.2) {\texttt{.args :: Vector\{Any\}}};
+        \node[font=\scriptsize\ttfamily, anchor=south] at (0, 2.2) {obj.scalar\_nonlinear.args :: Vector\{Any\}};
         \draw[thick, fill=mitlightgray!25, rounded corners=4pt]
           (-2.1, 0.7) rectangle (2.1, 2.1);
         \foreach \x/\y in {-1.4/1.65, -0.5/1.75, 0.5/1.55, 1.4/1.7,
@@ -462,18 +462,16 @@
 \begin{lstlisting}
 using GenOpt, JuMP, CUDA, MadNLP
 
-@constraint(model, [i in 1:n], x[1,i] == x0[i],
-    container = ParametrizedArray)                            # grouped constraint
-
-@objective(model, Min,
-    lazy_sum(0.5 * R[j] * u[i,j]^2 for i in 1:N, j in 1:p))   # grouped sum
+model = Model()
+@constraint(model, [i in 1:n], x[1,i] == x0[i], container = ParametrizedArray) # grouped constraint
+@objective(model, Min, lazy_sum(0.5 * R[j] * u[i,j]^2 for i in 1:N, j in 1:p)) # grouped sum
 
 set_optimizer(model, () -> GenOpt.ExaOptimizer(madnlp, CUDABackend()))
 optimize!(model)
 \end{lstlisting}
 \end{codebox}
   \begin{itemize}
-  \item Uses JuMP's own \alert{extension hooks} (a \texttt{ParametrizedArray} container, \texttt{lazy\_sum} generator) so the algebraic patterns \alert{never get unrolled} --- ExaModels sees the structured representation directly
+  \item Uses JuMP's own \alert{extension hooks} so the algebraic patterns \alert{never get unrolled} --- ExaModels sees the structured representation directly
   \item<2-> Minimal model rewrite: \texttt{container = ParametrizedArray} on \texttt{@constraint}, \texttt{lazy\_sum} on \texttt{@objective}
   \item<3-> A really cool proof-of-concept route --- I'm thinking about something else next.
   \end{itemize}
