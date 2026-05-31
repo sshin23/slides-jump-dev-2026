@@ -444,6 +444,7 @@
   \begin{itemize}\itemsep1pt
   \item JuMP stores the objective as an \alert{enumerated array of expression trees} in a flat \texttt{Vector\{Any\}} --- element types erased
   \item<2-> The ExaModels--JuMP extension walks every node, \alert{infers its type}, classifies it into an operator pattern ($x^2$, $\sin x$, $\exp x$, $\dots$) --- \alert{per-node type inference dominates the cost}
+  \item<3-> Worse: covering \alert{all of JuMP's syntax} (every operator, container, macro) is \alert{provably difficult}
   \end{itemize}
 \end{frame}
 
