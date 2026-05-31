@@ -14,10 +14,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Compile LaTeX (handout build)
+      - name: Compile LaTeX
         uses: xu-cheng/latex-action@v3
         with:
-          root_file: handout.tex
+          root_file: main.tex
           latexmk_use_xelatex: false
           latexmk_use_lualatex: false
           continue_on_error: false
@@ -25,10 +25,7 @@ jobs:
       - name: Stage PDF + landing page for GitHub Pages
         run: |
           mkdir -p _site
-          # Published filename stays `main.pdf` so existing URLs keep working;
-          # the underlying build is the overlays-flattened handout.
-          cp handout.pdf _site/main.pdf
-          cp handout.pdf main.pdf
+          cp main.pdf _site/main.pdf
           cat > _site/index.html <<'EOF'
           <!doctype html>
           <html lang="en">
