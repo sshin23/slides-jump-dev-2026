@@ -547,6 +547,7 @@ optimize!(model)
   \begin{itemize}\itemsep1pt
   \item Aggressive typing applies at the \alert{whole \texttt{ExaModel}}, not just the expression tree
   \item<2-> Possible because the type is \alert{fully inferable at the modeling-function level}
+  \item<3-> \alert{Aggressive typing} + \alert{full inlining}: LLVM IR is one giant block for the typed \texttt{ExaModel}
   \end{itemize}
 \end{frame}
 
@@ -567,7 +568,6 @@ optimize!(model)
   \begin{itemize}\itemsep1pt
   \item<3-> Same algebraic pattern $\Rightarrow$ \alert{cached, instant rebuild}
   \item<4-> A \alert{slight change} (one extra term) $\Rightarrow$ \alert{everything recompiles} ($\sim$99\% compilation time)
-  \item<5-> \alert{Aggressive typing} + \alert{full inlining}: LLVM IR is one giant block for the typed \texttt{ExaModel}
   \end{itemize}
 \end{frame}
 
