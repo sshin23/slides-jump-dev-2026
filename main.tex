@@ -574,7 +574,7 @@ optimize!(model)
 % =============================================================
 \section{Alternative: ExaModels as a JuMP backend for GPU}
 % =============================================================
-\begin{frame}{Alternative: ExaModels as a JuMP backend for GPU acceleration}{Idea: a small number of fully-typed buckets}
+\begin{frame}{Maybe an alternative: ExaModels as a JuMP backend for GPU acceleration}{Idea: a small number of fully-typed buckets}
   \begin{itemize}\itemsep2pt
   \item Don't ask JuMP to be fully type-stable. Give it a \alert{small number of buckets} --- each potentially large --- whose contents are \alert{fully typed and concrete}
   \item<2-> $\sim$10 patterns of practical significance: \alert{linear}, \alert{quadratic}, \alert{bilinear}, \alert{poly $\times\,\sin$}, \alert{poly $\times\,\exp$}, \dots, plus an \alert{Any fallback} bucket for anything else
