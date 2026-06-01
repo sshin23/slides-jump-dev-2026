@@ -270,7 +270,7 @@
       \item \alert{Algebraic modeling system} in Julia, JuMP-inspired syntax.
       \item<2-> Builds on \texttt{NLPModels.jl} --- compatible with: \texttt{Ipopt}, \texttt{MadNLP}, \texttt{KNITRO}, \texttt{Uno}, \dots (essentially all JSO-style solvers)
       \item<3-> Ships with its own AD system --- $f(x),\; g(x),\; \nabla_{x} f(x),\; \nabla_{x} g(x),\; \nabla^2_{xx} L(x,\lambda)$
-      \item<4-> \alert{\bfseries Killer feature}: \alert{GPU-compatible modeling} --- more on this later.
+      \item<4-> \alert{\bfseries Distinguishing feature}: \alert{GPU-compatible modeling} --- more on this later.
       \item<5-> \alert{\bfseries Design philosophy}: not optimized for ease-of-use, optimized for \alert{runtime performance}. Aim: the \alert{fastest modeling system} for building and running optimization solves.  
       \end{itemize}
     \end{column}
@@ -530,7 +530,7 @@ optimize!(model)
   \includegraphics[width=.95\textwidth]{exa_backend_scaling.pdf}
   \begin{itemize}\itemsep1pt
   \item Tree complexity \alert{decoupled from the array level}: only \alert{data-level parallelism} is applied; per-data-point ops are scalar Julia, fully type-inferable
-  \item<2-> Same model code runs on \texttt{CPU()}, \texttt{CUDABackend()}, \texttt{ROCBackend()}, \texttt{oneAPIBackend()}, \texttt{MetalBackend()} --- \alert{portable across GPU architectures}
+  \item<2-> Same model code runs on \texttt{CPU()}, \texttt{CUDABackend()}, \texttt{ROCBackend()}, \texttt{oneAPIBackend()}, \texttt{MetalBackend()} --- \alert{portable across GPU architectures} via the \alert{JuliaGPU stack}: \texttt{KernelAbstractions.jl} over \texttt{GPUCompiler.jl}
   \item<3-> Jacobian / Hessian: CUDA, AMDGPU reach \alert{$>100\times$} at $n_{\text{var}} \sim 10^6$; \texttt{oneAPI} fp64 on Arc A770 is emulated $\Rightarrow$ hardware limit, not a software gap
   \item<4-> More benchmark results presented at \alert{SIAM Optimization 2026} (MS369, Fri June 5)
   \end{itemize}
